@@ -23,14 +23,14 @@ setuptools.setup(
     description="Regulation agent using constraint programming",
     long_description=long_description,
     long_description_content_type="text/x-md",
-    url="https://github.com/chpombet/rlway-cpagent",
+    url="https://github.com/ed-rhilbert/cpagent",
     project_urls={
         "Documentation":
-        "https://github.com/chpombet/rlway-cpagent/blob/main/README.md",
+        "https://github.com/ed-rhilbert/cpagent/blob/main/README.md",
         "Source Code":
-        "https://github.com/chpombet/rlway-cpagent",
+        "https://github.com/ed-rhilbert/cpagent",
         "Bug Tracker":
-        "https://github.com/chpombet/rlway-cpagent/-/issues"
+        "https://github.com/ed-rhilbert/cpagent/-/issues"
     },
     classifiers=[
         "Programming Language :: Python :: 3",

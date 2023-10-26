@@ -1,16 +1,126 @@
 """Fixtures"""
 
+import shutil
 
 import pytest
 
-
-@pytest.fixture
-def name():
-    """Create a testing object"""
-    return "someone"
+from rlway.pyosrd import OSRD
+from rlway_cpagent.regulation_solver import CpRegulationProblem
 
 
-@pytest.fixture
-def number():
-    """Create a testing object"""
-    return 123
+# ---------------------------------------------------------------------------- #
+#                                OSRD use cases                                #
+# ---------------------------------------------------------------------------- #
+
+
+@pytest.fixture(scope='session')
+def osrd_point_switch():
+    """Create the simple OSRD use case 'point_switch'
+
+    Yields
+    ------
+    _type_
+        _description_
+    """
+    osrd = OSRD('tmp', 'point_switch')
+    osrd.add_delay('train0', 0, 400.)
+    yield osrd
+    shutil.rmtree('tmp', ignore_errors=True)
+
+
+# ---------------------------------------------------------------------------- #
+#                         CpRegulationProblem use cases                        #
+# ---------------------------------------------------------------------------- #
+
+
+@pytest.fixture(scope='session')
+def use_case_cp_4_zones_switch():
+    """Generate CP problem with 3 zones connected by one switch
+
+    Yields
+    ------
+    CpRegulationProblem
+        generated problem
+    """
+    problem = CpRegulationProblem(nb_trains=2, nb_zones=4)
+
+    problem.add_step(1, 1, 0, 0, 10, 20, False)
+    problem.add_step(1, 3, 1, 10, 20, 10, True)
+    problem.add_step(1, 4, 2, 20, 30, 10, False)
+
+    problem.add_step(2, 2, 0, 20, 30, 10, False)
+    problem.add_step(2, 3, 4, 30, 40, 10, True)
+    problem.add_step(2, 4, 5, 40, 50, 10, False)
+
+    yield problem
+
+
+@pytest.fixture(scope='session')
+def use_case_delay_conv():
+    """Generate a use case with 2 trains circulating
+    between two stations of 2 tracks connected by one track
+
+    Yields
+    ------
+    _type_
+        _description_
+    """
+    delay_at_first_departure = 0
+
+    problem = CpRegulationProblem(nb_trains=2, nb_zones=7)
+
+    problem.add_step(1, 1, 0, 0, 10, 10 + delay_at_first_departure, False)
+    problem.add_step(1, 3, 1, 10, 20, 10, True)
+    problem.add_step(1, 4, 2, 20, 30, 10, False)
+    problem.add_step(1, 5, 3, 30, 40, 10, True)
+    problem.add_step(1, 6, 4, 40, 50, 10, False)
+
+    problem.add_step(2, 2, 0, 20, 30, 10, False)
+    problem.add_step(1, 3, 6, 30, 40, 10, True)
+    problem.add_step(1, 4, 7, 40, 50, 10, False)
+    problem.add_step(1, 5, 8, 50, 60, 10, True)
+    problem.add_step(1, 7, 9, 60, 70, 10, False)
+
+    yield problem
+
+
+@pytest.fixture(scope='session')
+def use_case_infeasible():
+    """Generate an infeasible use case
+    with a straight line composed by 2 tracks
+
+    Yields
+    ------
+    _type_
+        _description_
+    """
+    problem = CpRegulationProblem(nb_trains=2, nb_zones=2)
+
+    problem.add_step(1, 1, 0, 0, 10, 30, False)
+    problem.add_step(1, 2, 1, 10, 20, 10, False)
+
+    problem.add_step(2, 1, 0, 10, 20, 10, False)
+    problem.add_step(2, 2, 1, 20, 30, 10, False)
+
+    yield problem
+
+
+@pytest.fixture(scope='session')
+def use_case_straight_line_2t():
+    """Generate a simple use case with a straight line of 2 tracks
+    and two trains with a delay on the first train
+
+    Yields
+    ------
+    _type_
+        _description_
+    """
+    problem = CpRegulationProblem(2, 2)
+
+    problem.add_step(1, 1, 0, 0, 10, 10, False)
+    problem.add_step(1, 2, 1, 10, 20, 20, False)
+
+    problem.add_step(2, 1, 0, 10, 20, 10, False)
+    problem.add_step(2, 2, 3, 20, 30, 10, False)
+
+    yield problem

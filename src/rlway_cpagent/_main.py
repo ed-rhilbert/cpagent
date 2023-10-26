@@ -2,25 +2,30 @@
 """
 
 from rlway.pyosrd.osrd import OSRD
+from rlway.schedules import schedule_from_osrd
 
 from rlway_cpagent.cp_agent import CPAgent
-from rlway.schedules import Schedule, schedule_from_osrd
-
-import matplotlib.pyplot as plt
-
+from rlway_cpagent.regulation_solver import *
+from rlway_cpagent.osrd_adapter import *
+from rlway_cpagent.utils import *
 
 def main():
     """
     rlway_cpagent main launch function used as an entry point
     """
-    sim = OSRD(use_case='station_capacity2', dir='tmp')
-    sim.reset_delays()
-    sim.add_delay('train0', time_threshold=150, delay=800.)
-    regulated = sim.regulate(agent=CPAgent("cp_agent", "gecode"))
-    ref_schedule = schedule_from_osrd(sim)
-    delayed_schedule = schedule_from_osrd(sim.delayed())
-    regulated_schedule = schedule_from_osrd(regulated)
+    problem = CpRegulationProblem(nb_trains=2, nb_zones=4)
+
+    problem.add_step(1, 1, 0, 0, 10, 20, False)
+    problem.add_step(1, 3, 1, 10, 20, 10, True)
+    problem.add_step(1, 4, 2, 20, 30, 10, False)
+
+    problem.add_step(2, 2, 0, 20, 30, 10, False)
+    problem.add_step(2, 3, 4, 30, 40, 10, True)
+    problem.add_step(2, 4, 5, 40, 50, 10, False)
     
-    ref_schedule.plot()
-    delayed_schedule.plot()
-    regulated_schedule.plot()
+    solution = CpRegulationSolution(
+        problem, 
+        OptimisationStatus.OPTIMAL,
+        [0, 20, 30, 10, 20, 30],
+        [20, 30, 40, 20, 30, 40])
+    check_spacing(solution)
