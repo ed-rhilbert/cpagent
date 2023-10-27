@@ -238,9 +238,9 @@ class MinizincRegulationSolver(CpRegulationSolver):
         problem : CpRegulationProblem
             problem to solve
         """
-        instance["T"] = problem.nb_trains
-        instance["Z"] = problem.nb_zones
-        instance["S"] = len(problem.steps)
+        instance["Nb_Trains"] = problem.nb_trains
+        instance["Nb_Zones"] = problem.nb_zones
+        instance["Nb_Steps"] = len(problem.steps)
         instance["train"] = problem.get_train_associations()
         instance["zone"] = problem.get_zone_associations()
         instance["prev"] = problem.get_prev_associations()
@@ -271,4 +271,5 @@ class MinizincRegulationSolver(CpRegulationSolver):
         if status == OptimisationStatus.FAILED:
             return CpRegulationSolution(problem, status, None, None)
 
-        return CpRegulationSolution(problem, status, result["a"], result["d"])
+        return CpRegulationSolution(
+            problem, status, result["arrival"], result["departure"])

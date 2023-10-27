@@ -1,60 +1,62 @@
 include "globals.mzn";
 
-% Données
+% Data
 
-int: Z; %Le nombre de zones
-int: T; %Le nombre de trains
-int: S; %Le nombre d'étapes (train passant par une zone)
+int: Nb_Zones;
+int: Nb_Trains;
+int: Nb_Steps;
 
-array[1..S] of 1..T: train; %Le train associé à une étape
-array[1..S] of 1..Z: zone; %La zone associée à une étape
-array[1..S] of 0..S: prev; %L'étape précédente
+array[1..Nb_Steps] of 1..Nb_Trains: train; % Train associated to a step
+array[1..Nb_Steps] of 1..Nb_Zones: zone; % Zone associated to a step
+array[1..Nb_Steps] of 0..Nb_Steps: prev; % Previous step
 
-array[1..S] of int: min_arrival; %L'heure d'arrivée min d'une étape
-array[1..S] of int: min_departure; %L'heure de départ min d'une étape
-array[1..S] of int: min_duration; %La durée min d'une étape
+array[1..Nb_Steps] of int: min_arrival; % Min arrival time of a step
+array[1..Nb_Steps] of int: min_departure; % Min departure time of a step
+array[1..Nb_Steps] of int: min_duration; % Min duration of a step
 
-array[1..S] of bool: is_fixed;
+array[1..Nb_Steps] of bool: is_fixed;
 
 % Variables
 
-array[1..S] of var int: a; %heure d'arrivée d'une étape
-array[1..S] of var int: d; %heure de départ d'une étape
+array[1..Nb_Steps] of var int: arrival; % Arrival time of a step
+array[1..Nb_Steps] of var int: departure; % Departure time of a step
 
-% Contraintes
+% Constraints
 
-%Pas de collisions
-constraint forall(z in 1..Z)(
+% No Collisions
+constraint forall(z in 1..Nb_Zones)(
   disjunctive(
-    [a[s] | s in 1..S where zone[s] == z], 
-    [d[s] - a[s] | s in 1..S where zone[s] == z])
+    [arrival[s] | s in 1..Nb_Steps where zone[s] == z], 
+    [departure[s] - arrival[s] | s in 1..Nb_Steps where zone[s] == z])
 );
 
-%On ne peut pas dépasser la référence
-constraint forall(s in 1..S) (
-  a[s] >= min_arrival[s] /\
-  d[s] >= min_departure[s]
+% A step cannot overtake its reference
+constraint forall(s in 1..Nb_Steps) (
+  arrival[s] >= min_arrival[s] /\
+  departure[s] >= min_departure[s]
 );
 
-%Le train doit passer plus de temps dans une zone que la durée min
-constraint forall(s in 1..S) (
-  d[s] - a[s] >= min_duration[s]
+% A step shall last longer than its min duration
+constraint forall(s in 1..Nb_Steps) (
+  departure[s] - arrival[s] >= min_duration[s]
 );
 
-%Certaines étapes ont une durée fixe
-constraint forall(s in 1..S where is_fixed[s])(
-  d[s] - a[s] = min_duration[s]
+% The duration of a step that is fixed should not be changed
+constraint forall(s in 1..Nb_Steps where is_fixed[s])(
+  departure[s] - arrival[s] = min_duration[s]
 );
 
-%Succession des étapes
-constraint forall(s in 1..S where prev[s] > 0) (
-  a[s] = d[prev[s]]
+% The arrival time at a step is equal to the departure time of the prev step
+constraint forall(s in 1..Nb_Steps where prev[s] > 0) (
+  arrival[s] = departure[prev[s]]
 );
 
-%Contrainte sur la première étape
-constraint forall(s in 1..S where prev[s] == 0) (
-  a[s] = min_arrival[s]
+% On the first step, arrival must be equal to the reference (min_arrival)
+constraint forall(s in 1..Nb_Steps where prev[s] == 0) (
+  arrival[s] = min_arrival[s]
 );
 
-%Fonction objectif
-solve minimize sum(s in 1..S)(d[s] - min_departure[s]);
+% Objectives
+
+% We minimize the sum of departure delays
+solve minimize sum(s in 1..Nb_Steps)(departure[s] - min_departure[s]);
