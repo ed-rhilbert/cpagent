@@ -150,8 +150,8 @@ lint-pylint: ## check style with pylint
 #############################################################
 
 docs: venv-warn clean-docs ## generate Sphinx HTML documentation
-	$(MAKE) -C docs html
-	$(BROWSER) docs/build/html/index.html
+	$(MAKE) -C docs/sphinx html
+	$(BROWSER) docs/sphinx/build/html/index.html
 
 
 
@@ -214,7 +214,7 @@ editable: venv-error ## install the package to the active Python's site-packages
 #############################################################
 
 clean-docs: ## remove docs artifacts
-	$(MAKE) -C docs clean
+	$(MAKE) -C docs/sphinx clean
 
 
 clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
