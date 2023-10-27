@@ -33,12 +33,12 @@ def test_get_delays(use_case_straight_line_2t):
     ]
 
     assert solution.get_delays() == delays_oracle
-    
-    
+
+
 def test_get_delays_empty(use_case_straight_line_2t):
     """Testing the function get_delays of the class CpRegulationSolution
     with an empty solution
-    
+
     Parameters
     ----------
     use_case_straight_line_2t : _type_
@@ -98,4 +98,3 @@ def test_minizinc_solver_infeasible(use_case_infeasible):
     solver = MinizincRegulationSolver("gecode", 30)
     solution = solver.solve(use_case_infeasible)
     assert solution.status == OptimisationStatus.FAILED
-

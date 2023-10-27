@@ -1,6 +1,6 @@
 """
-Provide the definition of a constraint programming problem applied to regulation,
-a CP regulation solution and a constraint programming solver
+Provide the definition of a constraint programming problem applied to
+regulation, a CP regulation solution and a constraint programming solver
 """
 
 from typing import Any, Dict, List

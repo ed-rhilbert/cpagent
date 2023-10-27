@@ -8,8 +8,10 @@ from rlway.pyosrd.osrd import OSRD
 from rlway.pyosrd.agents import Agent
 
 from rlway_cpagent.regulation_solver import MinizincRegulationSolver
-from rlway_cpagent.osrd_adapter import regulation_problem_from_osrd, osrd_stops_from_solution
-from rlway_cpagent.utils import check_solution_validity
+from rlway_cpagent.osrd_adapter import (
+    regulation_problem_from_osrd,
+    osrd_stops_from_solution,
+)
 
 
 class CPAgent(Agent):

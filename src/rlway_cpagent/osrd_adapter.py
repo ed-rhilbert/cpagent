@@ -52,15 +52,18 @@ def regulation_problem_from_osrd(osrd: OSRD) -> CpRegulationProblem:
                 prev_step,
                 int(starts.loc[zone][train_idx]),
                 int(ends.loc[zone][train_idx]),
-                int(delayed_ends.loc[zone][train_idx]) - int(delayed_starts.loc[zone][train_idx]),
-                (True if osrd.stop_positions[train_idx][zone]['offset'] is None else False)
+                int(delayed_ends.loc[zone][train_idx])
+                - int(delayed_starts.loc[zone][train_idx]),
+                True if osrd.stop_positions[train_idx][zone]['offset']
+                is None else False
             )
             prev_step = len(problem.steps)
 
     return problem
 
 
-def osrd_stops_from_solution(osrd: OSRD, solution: CpRegulationSolution) -> List[Dict[str, Any]]:
+def osrd_stops_from_solution(
+        osrd: OSRD, solution: CpRegulationSolution) -> List[Dict[str, Any]]:
     """Transform a constraint programming solution to a list of stops
 
     Parameters
@@ -81,10 +84,11 @@ def osrd_stops_from_solution(osrd: OSRD, solution: CpRegulationSolution) -> List
     ref_schedule = schedule_from_osrd(osrd)
     zones = ref_schedule.blocks
     for delay in solution.get_delays():
-        assert osrd.stop_positions[delay["train"]-1][zones[delay["zone"]-1]]['offset'] is not None
+        pos = osrd.stop_positions[delay["train"]-1][zones[delay["zone"]-1]]
+        assert pos['offset'] is not None
         stops.append({
             "train": delay["train"]-1,
-            "position": osrd.stop_positions[delay["train"]-1][zones[delay["zone"]-1]]['offset'],
+            "position": pos['offset'],
             "duration": delay["duration"]
         })
     return stops
