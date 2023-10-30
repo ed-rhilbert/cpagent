@@ -7,14 +7,16 @@ from typing import Any, Dict, List
 from rlway.pyosrd.osrd import OSRD
 from rlway.pyosrd.agents import Agent
 
-from rlway_cpagent.regulation_solver import MinizincRegulationSolver
+from rlway_cpagent.minizinc_agent.minizinc_solver import (
+    MinizincRegulationSolver,
+)
 from rlway_cpagent.osrd_adapter import (
     regulation_problem_from_osrd,
     osrd_stops_from_solution,
 )
 
 
-class CPAgent(Agent):
+class MinizincAgent(Agent):
     """
     A regulation agent using a constraint programming solver
     """

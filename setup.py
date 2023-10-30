@@ -47,6 +47,7 @@ setuptools.setup(
     setup_requires=["wheel"],
     install_requires=[
         'minizinc',
+        'ortools'
         'rlway @ git+ssh://git@github.com/y-plus/RLway.git',
         'importlib-resources'
         ],
