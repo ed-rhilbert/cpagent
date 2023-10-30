@@ -40,7 +40,7 @@ setuptools.setup(
     packages=setuptools.find_packages(where="src"),
     package_data={"": ['models/*.mzn']},
 
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     setup_requires=["wheel"],
     install_requires=[
         'minizinc',
