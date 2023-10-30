@@ -38,10 +38,10 @@ def test_solver_simple(solver, use_case_straight_line_2t):
         _description_
     """
     solution = solver.solve(use_case_straight_line_2t)
+    cost_oracle = 30
     arrivals_oracle = [0, 10, 10, 30]
     departures_oracle = [10, 30, 30, 40]
-    print(solution.arrivals)
-    print(solution.departures)
+    assert solution.cost == cost_oracle
     assert solution.arrivals == arrivals_oracle
     assert solution.departures == departures_oracle
 

@@ -138,6 +138,7 @@ class CpRegulationSolution:
 
     problem: CpRegulationProblem
     status: OptimisationStatus
+    cost: int
     arrivals: List[int]
     departures: List[int]
 
@@ -162,6 +163,24 @@ class CpRegulationSolution:
                     "zone": step["zone"],
                     "duration": delay})
         return delays
+
+    def __eq__(self, other):
+        return self.cost == other.cost
+
+    def __ne__(self, other):
+        return self.cost != other.cost
+
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+    def __le__(self, other):
+        return self.cost <= other.cost
+
+    def __gt__(self, other):
+        return self.cost > other.cost
+
+    def __ge__(self, other):
+        return self.cost >= other.cost
 
 
 class CpRegulationSolver(ABC):

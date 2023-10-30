@@ -182,10 +182,11 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         """
         status = OrtoolsRegulationSolver.status_map[ortoos_status]
         if status == OptimisationStatus.FAILED:
-            return CpRegulationSolution(problem, status, None, None)
+            return CpRegulationSolution(problem, status, None, None, None)
 
         return CpRegulationSolution(
             problem,
             status,
+            int(solver.ObjectiveValue()),
             solver.Values(self.arrivals).to_list(),
             solver.Values(self.departures).to_list())

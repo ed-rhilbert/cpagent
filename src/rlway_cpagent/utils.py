@@ -25,6 +25,7 @@ def check_solution_validity(cp_solution: CpRegulationSolution) -> bool:
         and check_min_duration(cp_solution)
         and check_fixed_duration(cp_solution)
         and check_first_step(cp_solution)
+        and check_objective_value(cp_solution)
     )
 
 
@@ -171,4 +172,26 @@ def check_first_step(cp_solution: CpRegulationSolution) -> bool:
         cp_solution.arrivals[step_idx] != step["min_arrival"]
         for step_idx, step in enumerate(cp_solution.problem.steps)
         if step["prev"] == -1
+    )
+
+
+def check_objective_value(cp_solution: CpRegulationSolution) -> bool:
+    """Check that the objective value match the sum of departure
+    delays
+
+    Parameters
+    ----------
+    cp_solution : CpRegulationSolution
+        solution returned by the solver
+
+    Returns
+    -------
+    bool
+        True if the objective value match the sum of the departure delays
+    """
+    return cp_solution.cost == sum(
+        [
+            cp_solution.departures[i] - step["min_departure"]
+            for i, step in enumerate(cp_solution.problem.steps)
+        ]
     )

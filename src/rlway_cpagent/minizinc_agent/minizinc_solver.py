@@ -99,6 +99,7 @@ class MinizincRegulationSolver(CpRegulationSolver):
         """
         status = MinizincRegulationSolver.status_map[result.status]
         if status == OptimisationStatus.FAILED:
-            return CpRegulationSolution(problem, status, None, None)
+            return CpRegulationSolution(problem, status, None, None, None)
 
-        return CpRegulationSolution(problem, status, result["a"], result["d"])
+        return CpRegulationSolution(
+            problem, status, result.objective, result["a"], result["d"])

@@ -44,6 +44,7 @@ def test_osrd_stops_from_solution(osrd_point_switch):
     solution = CpRegulationSolution(
         cp_problem,
         OptimisationStatus.OPTIMAL,
+        0,
         [0, 236, 242, 100, 336, 342],
         [242, 247, 450, 442, 347, 550])
 
@@ -71,6 +72,7 @@ def test_osrd_stops_from_solution_empty(osrd_point_switch):
     solution = CpRegulationSolution(
         cp_problem,
         OptimisationStatus.FAILED,
+        0,
         [0, 236, 242, 100, 336, 342],
         [242, 247, 450, 442, 347, 600])
 
@@ -92,6 +94,7 @@ def test_osrd_stops_from_solution_invalid_stop(osrd_point_switch):
     solution = CpRegulationSolution(
         cp_problem,
         OptimisationStatus.OPTIMAL,
+        None,
         None,
         None)
 

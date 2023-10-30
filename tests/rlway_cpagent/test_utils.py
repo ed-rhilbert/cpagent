@@ -15,6 +15,7 @@ from rlway_cpagent.utils import (
     check_min_duration,
     check_fixed_duration,
     check_first_step,
+    check_objective_value,
 )
 
 
@@ -29,6 +30,7 @@ def test_check_solution_validity_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -46,6 +48,7 @@ def test_check_solution_validity_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 30, 40, 50],
         [20, 30, 40, 40, 50, 60])
 
@@ -63,6 +66,7 @@ def test_check_spacing_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        0,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -80,6 +84,7 @@ def test_check_spacing_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 10, 20, 30],
         [20, 30, 40, 20, 30, 40])
 
@@ -97,6 +102,7 @@ def test_check_chaining_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -114,6 +120,7 @@ def test_check_chaining_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 35, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -131,6 +138,7 @@ def test_check_min_arrival_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -148,6 +156,7 @@ def test_check_min_arrival_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 25, 40],
         [20, 30, 40, 25, 40, 50])
 
@@ -165,6 +174,7 @@ def test_check_min_departure_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -182,6 +192,7 @@ def test_check_min_departure_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 25, 40],
         [20, 30, 40, 25, 40, 50])
 
@@ -199,6 +210,7 @@ def test_check_min_duration_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -216,6 +228,7 @@ def test_check_min_duration_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 25, 40],
         [20, 30, 40, 25, 40, 50])
 
@@ -233,6 +246,7 @@ def test_check_fixed_duration_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -250,6 +264,7 @@ def test_check_fixed_duration_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 50],
         [20, 30, 40, 30, 50, 60])
 
@@ -267,6 +282,7 @@ def test_check_first_step_valid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
@@ -284,7 +300,44 @@ def test_check_first_step_invalid(use_case_cp_4_zones_switch):
     solution = CpRegulationSolution(
         use_case_cp_4_zones_switch,
         OptimisationStatus.OPTIMAL,
+        30,
         [0, 20, 30, 30, 40, 50],
         [20, 30, 40, 40, 50, 60])
 
     assert not check_first_step(solution)
+
+
+def test_check_objective_value(use_case_cp_4_zones_switch):
+    """Test method check_objective_value with valid solution
+
+    Parameters
+    ----------
+    use_case_cp_4_zones_switch : _type_
+        _description_
+    """
+    solution = CpRegulationSolution(
+        use_case_cp_4_zones_switch,
+        OptimisationStatus.OPTIMAL,
+        30,
+        [0, 20, 30, 20, 30, 40],
+        [20, 30, 40, 30, 40, 50])
+
+    assert check_objective_value(solution)
+
+
+def test_check_objective_value_invalid(use_case_cp_4_zones_switch):
+    """Test method check_objective_value with invalid solution
+
+    Parameters
+    ----------
+    use_case_cp_4_zones_switch : _type_
+        _description_
+    """
+    solution = CpRegulationSolution(
+        use_case_cp_4_zones_switch,
+        OptimisationStatus.OPTIMAL,
+        10,
+        [0, 20, 30, 20, 30, 40],
+        [20, 30, 40, 30, 40, 50])
+
+    assert not check_objective_value(solution)

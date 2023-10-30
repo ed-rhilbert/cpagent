@@ -15,6 +15,7 @@ def test_get_delays(use_case_straight_line_2t):
     solution = CpRegulationSolution(
         use_case_straight_line_2t,
         OptimisationStatus.OPTIMAL,
+        0,
         [0, 10, 10, 30],
         [10, 30, 30, 40])
 
@@ -41,6 +42,7 @@ def test_get_delays_empty(use_case_straight_line_2t):
     solution = CpRegulationSolution(
         use_case_straight_line_2t,
         OptimisationStatus.FAILED,
+        None,
         None,
         None)
 
