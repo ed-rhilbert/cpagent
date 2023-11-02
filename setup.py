@@ -39,9 +39,6 @@ setuptools.setup(
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
     package_data={"": ['models/*.mzn']},
-    entry_points={
-        'console_scripts': ['rlway_cpagent = rlway_cpagent._main:main'],
-    },
 
     python_requires=">=3.8",
     setup_requires=["wheel"],
