@@ -25,6 +25,7 @@ def check_solution_validity(cp_solution: CpRegulationSolution) -> bool:
         and check_min_duration(cp_solution)
         and check_fixed_duration(cp_solution)
         and check_first_step(cp_solution)
+        and check_objective_value(cp_solution)
     )
 
 
@@ -43,7 +44,7 @@ def check_spacing(cp_solution: CpRegulationSolution) -> bool:
         true if the solution respects the constraint
     """
     is_overlapping = []
-    for zone_idx in range(1, cp_solution.problem.nb_zones + 1):
+    for zone_idx in range(cp_solution.problem.nb_zones):
         intervals = [
             (cp_solution.arrivals[idx], cp_solution.departures[idx])
             for idx, step in enumerate(cp_solution.problem.steps)
@@ -69,9 +70,9 @@ def check_chaining(cp_solution: CpRegulationSolution) -> bool:
         True if the solution respect the constraint
     """
     return not any([
-        cp_solution.departures[step["prev"] - 1] != cp_solution.arrivals[step_idx]
+        cp_solution.departures[step["prev"]] != cp_solution.arrivals[step_idx]
         for step_idx, step in enumerate(cp_solution.problem.steps)
-        if step["prev"] != 0
+        if step["prev"] != -1
     ])
 
 
@@ -170,5 +171,27 @@ def check_first_step(cp_solution: CpRegulationSolution) -> bool:
     return not any(
         cp_solution.arrivals[step_idx] != step["min_arrival"]
         for step_idx, step in enumerate(cp_solution.problem.steps)
-        if step["prev"] == 0
+        if step["prev"] == -1
+    )
+
+
+def check_objective_value(cp_solution: CpRegulationSolution) -> bool:
+    """Check that the objective value match the sum of departure
+    delays
+
+    Parameters
+    ----------
+    cp_solution : CpRegulationSolution
+        solution returned by the solver
+
+    Returns
+    -------
+    bool
+        True if the objective value match the sum of the departure delays
+    """
+    return cp_solution.cost == sum(
+        [
+            cp_solution.departures[i] - step["min_departure"]
+            for i, step in enumerate(cp_solution.problem.steps)
+        ]
     )
