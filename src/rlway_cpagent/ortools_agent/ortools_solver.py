@@ -170,7 +170,8 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             problem to solve
         """
         model.Minimize(sum([
-            self.departures[i] - step['min_departure']
+            (self.departures[i] - step['min_departure'])
+            * step['ponderation']
             for i, step in enumerate(problem.steps)
         ]))
 

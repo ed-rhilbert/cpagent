@@ -191,7 +191,8 @@ def check_objective_value(cp_solution: CpRegulationSolution) -> bool:
     """
     return cp_solution.cost == sum(
         [
-            cp_solution.departures[i] - step["min_departure"]
+            (cp_solution.departures[i] - step["min_departure"])
+            * step["ponderation"]
             for i, step in enumerate(cp_solution.problem.steps)
         ]
     )

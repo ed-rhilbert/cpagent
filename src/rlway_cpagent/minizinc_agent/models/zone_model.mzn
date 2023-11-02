@@ -15,6 +15,7 @@ array[1..N_steps] of int: min_departure; % Min departure time of a step
 array[1..N_steps] of int: min_duration; % Min duration of a step
 
 array[1..N_steps] of bool: is_fixed; % True if a step is fixed
+array[1..N_steps] of int: ponderation;
 
 set of 1..N_zones: active_zones; % set of zones associated with at least one step
 
@@ -61,4 +62,4 @@ constraint forall(s in 1..N_steps where prev[s] == 0) (
 % Objectives
 
 % We minimize the sum of departure delays
-solve minimize sum(s in 1..N_steps)(departure[s] - min_departure[s]);
+solve minimize sum(s in 1..N_steps)((departure[s] - min_departure[s]) * ponderation[s]);

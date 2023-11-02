@@ -81,13 +81,13 @@ def use_case_cp_4_zones_switch():
     """
     problem = CpRegulationProblem(nb_trains=2, nb_zones=4)
 
-    problem.add_step(0, 0, -1, 0, 10, 20, False)
-    problem.add_step(0, 2, 0, 10, 20, 10, True)
-    problem.add_step(0, 3, 1, 20, 30, 10, False)
+    problem.add_step(0, 0, -1, 0, 10, 20, False, 2)
+    problem.add_step(0, 2, 0, 10, 20, 10, True, 2)
+    problem.add_step(0, 3, 1, 20, 30, 10, False, 2)
 
-    problem.add_step(1, 1, -1, 20, 30, 10, False)
-    problem.add_step(1, 2, 3, 30, 40, 10, True)
-    problem.add_step(1, 3, 4, 40, 50, 10, False)
+    problem.add_step(1, 1, -1, 20, 30, 10, False, 2)
+    problem.add_step(1, 2, 3, 30, 40, 10, True, 2)
+    problem.add_step(1, 3, 4, 40, 50, 10, False, 2)
 
     yield problem
 
@@ -106,17 +106,17 @@ def use_case_delay_conv():
 
     problem = CpRegulationProblem(nb_trains=2, nb_zones=7)
 
-    problem.add_step(0, 0, -1, 0, 10, 10 + delay_at_first_departure, False)
-    problem.add_step(0, 2, 0, 10, 20, 10, True)
-    problem.add_step(0, 3, 1, 20, 30, 10, False)
-    problem.add_step(0, 4, 2, 30, 40, 10, True)
-    problem.add_step(0, 5, 3, 40, 50, 10, False)
+    problem.add_step(0, 0, -1, 0, 10, 10 + delay_at_first_departure, False, 1)
+    problem.add_step(0, 2, 0, 10, 20, 10, True, 1)
+    problem.add_step(0, 3, 1, 20, 30, 10, False, 1)
+    problem.add_step(0, 4, 2, 30, 40, 10, True, 1)
+    problem.add_step(0, 5, 3, 40, 50, 10, False, 1)
 
-    problem.add_step(1, 1, -1, 20, 30, 10, False)
-    problem.add_step(1, 2, 5, 30, 40, 10, True)
-    problem.add_step(1, 3, 6, 40, 50, 10, False)
-    problem.add_step(1, 4, 6, 50, 60, 10, True)
-    problem.add_step(1, 6, 8, 60, 70, 10, False)
+    problem.add_step(1, 1, -1, 20, 30, 10, False, 1)
+    problem.add_step(1, 2, 5, 30, 40, 10, True, 1)
+    problem.add_step(1, 3, 6, 40, 50, 10, False, 1)
+    problem.add_step(1, 4, 6, 50, 60, 10, True, 1)
+    problem.add_step(1, 6, 8, 60, 70, 10, False, 1)
 
     yield problem
 

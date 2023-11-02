@@ -11,15 +11,19 @@ from rlway_cpagent.utils import check_solution_validity
 
 
 @pytest.mark.parametrize("use_case,solver", [
+    ("use_case_cp_4_zones_switch", OrtoolsRegulationSolver("ortools", 30)),
+    ("use_case_delay_conv", OrtoolsRegulationSolver("ortools", 30)),
     ("use_case_cp_4_zones_switch",
-     OrtoolsRegulationSolver("ortools", 30)),
+     MinizincRegulationSolver("minizinc", "gecode", 30)),
     ("use_case_delay_conv",
      MinizincRegulationSolver("minizinc", "gecode", 30))])
 def test_solver_feasible(use_case, solver, request):
-    """Test the validity of a solution returned by
-    the solver minizinc for the use case use_case_cp_4_zones_switch
+    """Test the validity of the solution returned by
+    the solvers minizinc and ortools for the use cases
+    use_case_cp_4_zones_switch and use_case_delay_conv
     """
     solution = solver.solve(request.getfixturevalue(use_case))
+    print(solution.cost)
     assert check_solution_validity(solution)
 
 

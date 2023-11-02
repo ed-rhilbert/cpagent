@@ -80,6 +80,7 @@ class MinizincRegulationSolver(CpRegulationSolver):
         instance["is_fixed"] = problem.get_is_fixed()
         instance["active_zones"] = \
             set([zone+1 for zone in problem.get_zone_associations()])
+        instance["ponderation"] = problem.get_ponderations()
 
     def _get_solution_from_result(
             self,
