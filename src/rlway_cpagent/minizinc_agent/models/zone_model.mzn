@@ -62,4 +62,4 @@ constraint forall(s in 1..N_steps where prev[s] == 0) (
 % Objectives
 
 % We minimize the sum of departure delays
-solve minimize sum(s in 1..N_steps)((departure[s] - min_departure[s]) * ponderation[s]);
+solve minimize sum(s in 1..N_steps)((arrival[s] - min_arrival[s]) * ponderation[s]);
