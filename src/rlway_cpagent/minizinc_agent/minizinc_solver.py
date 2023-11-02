@@ -65,9 +65,9 @@ class MinizincRegulationSolver(CpRegulationSolver):
         problem : CpRegulationProblem
             problem to solve
         """
-        instance["T"] = problem.nb_trains
-        instance["Z"] = problem.nb_zones
-        instance["S"] = len(problem.steps)
+        instance["N_trains"] = problem.nb_trains
+        instance["N_zones"] = problem.nb_zones
+        instance["N_steps"] = len(problem.steps)
         instance["train"] = [train+1
                              for train in problem.get_train_associations()]
         instance["zone"] = [zone+1
@@ -102,4 +102,5 @@ class MinizincRegulationSolver(CpRegulationSolver):
             return CpRegulationSolution(problem, status, None, None, None)
 
         return CpRegulationSolution(
-            problem, status, result.objective, result["a"], result["d"])
+            problem, status, result.objective,
+            result["arrival"], result["departure"])
