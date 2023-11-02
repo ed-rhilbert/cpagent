@@ -2,61 +2,61 @@ include "globals.mzn";
 
 % Data
 
-int: Nb_Zones;
-int: Nb_Trains;
-int: Nb_Steps;
+int: N_zones;
+int: N_trains;
+int: N_steps;
 
-array[1..Nb_Steps] of 1..Nb_Trains: train; % Train associated to a step
-array[1..Nb_Steps] of 1..Nb_Zones: zone; % Zone associated to a step
-array[1..Nb_Steps] of 0..Nb_Steps: prev; % Previous step
+array[1..N_steps] of 1..N_trains: train; % Train associated to a step
+array[1..N_steps] of 1..N_zones: zone; % Zone associated to a step
+array[1..N_steps] of 0..N_steps: prev; % Previous step
 
-array[1..Nb_Steps] of int: min_arrival; % Min arrival time of a step
-array[1..Nb_Steps] of int: min_departure; % Min departure time of a step
-array[1..Nb_Steps] of int: min_duration; % Min duration of a step
+array[1..N_steps] of int: min_arrival; % Min arrival time of a step
+array[1..N_steps] of int: min_departure; % Min departure time of a step
+array[1..N_steps] of int: min_duration; % Min duration of a step
 
-array[1..Nb_Steps] of bool: is_fixed;
+array[1..N_steps] of bool: is_fixed;
 
 % Variables
 
-array[1..Nb_Steps] of var int: arrival; % Arrival time of a step
-array[1..Nb_Steps] of var int: departure; % Departure time of a step
+array[1..N_steps] of var int: arrival; % Arrival time of a step
+array[1..N_steps] of var int: departure; % Departure time of a step
 
 % Constraints
 
-% No Collisions
-constraint forall(z in 1..Nb_Zones)(
+% 1. Two trains shouldn't collide 
+constraint forall(z in 1..N_zones)(
   disjunctive(
-    [arrival[s] | s in 1..Nb_Steps where zone[s] == z], 
-    [departure[s] - arrival[s] | s in 1..Nb_Steps where zone[s] == z])
+    [arrival[s] | s in 1..N_steps where zone[s] == z], 
+    [departure[s] - arrival[s] | s in 1..N_steps where zone[s] == z])
 );
 
-% A step cannot overtake its reference
-constraint forall(s in 1..Nb_Steps) (
+% 2. A step cannot overtake its reference
+constraint forall(s in 1..N_steps) (
   arrival[s] >= min_arrival[s] /\
   departure[s] >= min_departure[s]
 );
 
-% A step shall last longer than its min duration
-constraint forall(s in 1..Nb_Steps) (
+% 3. A step shall last longer than its min duration
+constraint forall(s in 1..N_steps) (
   departure[s] - arrival[s] >= min_duration[s]
 );
 
-% The duration of a step that is fixed should not be changed
-constraint forall(s in 1..Nb_Steps where is_fixed[s])(
+% 4. The duration of a step that is fixed should not be changed
+constraint forall(s in 1..N_steps where is_fixed[s])(
   departure[s] - arrival[s] = min_duration[s]
 );
 
-% The arrival time at a step is equal to the departure time of the prev step
-constraint forall(s in 1..Nb_Steps where prev[s] > 0) (
+% 5. The arrival time at a step is equal to the departure time of the prev step
+constraint forall(s in 1..N_steps where prev[s] > 0) (
   arrival[s] = departure[prev[s]]
 );
 
-% On the first step, arrival must be equal to the reference (min_arrival)
-constraint forall(s in 1..Nb_Steps where prev[s] == 0) (
+% 6. On the first step, arrival must be equal to the reference (min_arrival)
+constraint forall(s in 1..N_steps where prev[s] == 0) (
   arrival[s] = min_arrival[s]
 );
 
 % Objectives
 
 % We minimize the sum of departure delays
-solve minimize sum(s in 1..Nb_Steps)(departure[s] - min_departure[s]);
+solve minimize sum(s in 1..N_steps)(departure[s] - min_departure[s]);
