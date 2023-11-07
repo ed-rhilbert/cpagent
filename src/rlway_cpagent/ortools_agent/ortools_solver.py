@@ -23,7 +23,8 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         cp_model.INFEASIBLE: OptimisationStatus.FAILED
     }
 
-    def __init__(self) -> None:
+    def __init__(self, max_optimization_time: int) -> None:
+        self.max_optimization_time = max_optimization_time
         self.arrivals = None
         self.departures = None
         self.durations = None
@@ -47,6 +48,7 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         self._create_constraints(model, problem)
         self._create_objective(model, problem)
         solver = cp_model.CpSolver()
+        solver.parameters.max_time_in_seconds = self.max_optimization_time
         status = solver.Solve(model)
         return self._get_solution(solver, status, problem)
 
