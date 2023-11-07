@@ -180,7 +180,8 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         CpRegulationSolution
             result solution
         """
-        status = OrtoolsRegulationSolver.status_map[ortoos_status]
+        status = OrtoolsRegulationSolver.status_map.get(
+            ortoos_status, OptimisationStatus.FAILED)
         if status == OptimisationStatus.FAILED:
             return CpRegulationSolution(problem, status, None, None, None)
 

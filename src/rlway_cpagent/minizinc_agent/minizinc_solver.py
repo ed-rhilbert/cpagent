@@ -97,7 +97,8 @@ class MinizincRegulationSolver(CpRegulationSolver):
         CpRegulationSolution
             solution to the problem
         """
-        status = MinizincRegulationSolver.status_map[result.status]
+        status = MinizincRegulationSolver.status_map.get(
+            result.status, OptimisationStatus.FAILED)
         if status == OptimisationStatus.FAILED:
             return CpRegulationSolution(problem, status, None, None, None)
 
