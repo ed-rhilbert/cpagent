@@ -11,7 +11,7 @@ from rlway_cpagent.utils import check_solution_validity
 
 
 @pytest.mark.parametrize("use_case,solver", [
-    ("use_case_cp_4_zones_switch", OrtoolsRegulationSolver()),
+    ("use_case_cp_4_zones_switch", OrtoolsRegulationSolver(30)),
     ("use_case_delay_conv", MinizincRegulationSolver("gecode", 30))])
 def test_solver_feasible(use_case, solver, request):
     """Test the validity of a solution returned by
@@ -22,7 +22,7 @@ def test_solver_feasible(use_case, solver, request):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsRegulationSolver(),
+    OrtoolsRegulationSolver(30),
     MinizincRegulationSolver("gecode", 30)])
 def test_solver_simple(solver, use_case_straight_line_2t):
     """Testing minizinc solver on a simple use case
@@ -37,7 +37,7 @@ def test_solver_simple(solver, use_case_straight_line_2t):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsRegulationSolver(),
+    OrtoolsRegulationSolver(30),
     MinizincRegulationSolver("gecode", 30)])
 def test_solver_infeasible(solver, use_case_infeasible):
     """Test minizinc solver with infeasible problem

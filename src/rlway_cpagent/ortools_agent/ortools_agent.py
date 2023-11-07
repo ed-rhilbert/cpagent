@@ -15,6 +15,8 @@ from rlway_cpagent.osrd_adapter import (
     osrd_stops_from_solution,
 )
 
+SOLVER_TIMEOUT = 30
+
 
 class OrtoolsAgent(Agent):
     """
@@ -38,6 +40,6 @@ class OrtoolsAgent(Agent):
             _description_
         """
         problem = regulation_problem_from_osrd(osrd)
-        solver = OrtoolsRegulationSolver()
+        solver = OrtoolsRegulationSolver(SOLVER_TIMEOUT)
         solution = solver.solve(problem)
         return osrd_stops_from_solution(osrd, solution)

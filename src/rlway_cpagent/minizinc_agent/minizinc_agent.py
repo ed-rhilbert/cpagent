@@ -16,7 +16,7 @@ from rlway_cpagent.osrd_adapter import (
 )
 
 SOLVER = "gecode"
-TIMEOUT = 30
+SOLVER_TIMEOUT = 30
 
 
 class MinizincAgent(Agent):
@@ -31,6 +31,6 @@ class MinizincAgent(Agent):
         """Solve a regulation problem
         """
         problem = regulation_problem_from_osrd(osrd)
-        solver = MinizincRegulationSolver(SOLVER, TIMEOUT)
+        solver = MinizincRegulationSolver(SOLVER, SOLVER_TIMEOUT)
         solution = solver.solve(problem)
         return osrd_stops_from_solution(osrd, solution)
