@@ -49,13 +49,13 @@ class MinizincRegulationSolver(CpRegulationSolver):
                               "zone_model.mzn"))
         solver = Solver.lookup(self.solver_name)
         instance = Instance(solver, model)
-        self.fill_instance(instance, problem)
+        self._fill_instance(instance, problem)
         result = instance.solve(
             timeout=timedelta(seconds=self.max_optimisation_time))
-        solution = self.get_solution_from_result(problem, result)
+        solution = self._get_solution_from_result(problem, result)
         return solution
 
-    def fill_instance(self, instance: Instance, problem: CpRegulationProblem):
+    def _fill_instance(self, instance: Instance, problem: CpRegulationProblem):
         """Use the minizinc module interface to load the problem
 
         Parameters
@@ -79,7 +79,7 @@ class MinizincRegulationSolver(CpRegulationSolver):
         instance["min_duration"] = problem.get_min_durations()
         instance["is_fixed"] = problem.get_is_fixed()
 
-    def get_solution_from_result(
+    def _get_solution_from_result(
             self,
             problem: CpRegulationProblem,
             result: Result) -> CpRegulationSolution:

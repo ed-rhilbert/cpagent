@@ -13,11 +13,6 @@ from rlway_cpagent.regulation_solver import (
 
 def test_regulation_problem_from_osrd(osrd_point_switch):
     """Testing convertion from osrd to cp problem
-
-    Parameters
-    ----------
-    osrd_point_switch : _type_
-        _description_
     """
     cp_problem = regulation_problem_from_osrd(osrd_point_switch)
 
@@ -34,11 +29,6 @@ def test_regulation_problem_from_osrd(osrd_point_switch):
 
 def test_osrd_stops_from_solution(osrd_point_switch):
     """Testing convertion from solution to osrd stops
-
-    Parameters
-    ----------
-    osrd_point_switch : _type_
-        _description_
     """
     cp_problem = regulation_problem_from_osrd(osrd_point_switch)
     solution = CpRegulationSolution(
@@ -62,11 +52,6 @@ def test_osrd_stops_from_solution(osrd_point_switch):
 def test_osrd_stops_from_solution_empty(osrd_point_switch):
     """Testing convertion from solution to osrd stops
     with an empty invalid solution
-
-    Parameters
-    ----------
-    osrd_point_switch : _type_
-        _description_
     """
     cp_problem = regulation_problem_from_osrd(osrd_point_switch)
     solution = CpRegulationSolution(
@@ -84,11 +69,6 @@ def test_osrd_stops_from_solution_empty(osrd_point_switch):
 def test_osrd_stops_from_solution_invalid_stop(osrd_point_switch):
     """Testing convertion from solution to osrd stops
     with an invalid solution
-
-    Parameters
-    ----------
-    osrd_point_switch : _type_
-        _description_
     """
     cp_problem = regulation_problem_from_osrd(osrd_point_switch)
     solution = CpRegulationSolution(

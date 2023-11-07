@@ -22,9 +22,9 @@ class OrtoolsAgent(Agent):
     """
 
     def stops(self, osrd: OSRD) -> List[Dict[str, Any]]:
-        return self.solve_cp_problem(osrd)
+        return self._solve_cp_problem(osrd)
 
-    def solve_cp_problem(self, osrd: OSRD):
+    def _solve_cp_problem(self, osrd: OSRD):
         """Solve a regulation problem
 
         Parameters

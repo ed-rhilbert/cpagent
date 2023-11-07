@@ -6,11 +6,6 @@ from rlway_cpagent.regulation_solver import (
 
 def test_get_delays(use_case_straight_line_2t):
     """Testing the function get_delays of the class CpRegulationSolution
-
-    Parameters
-    ----------
-    use_case_straight_line_2t : _type_
-        _description_
     """
     solution = CpRegulationSolution(
         use_case_straight_line_2t,
@@ -33,11 +28,6 @@ def test_get_delays(use_case_straight_line_2t):
 def test_get_delays_empty(use_case_straight_line_2t):
     """Testing the function get_delays of the class CpRegulationSolution
     with an empty solution
-
-    Parameters
-    ----------
-    use_case_straight_line_2t : _type_
-        _description_
     """
     solution = CpRegulationSolution(
         use_case_straight_line_2t,

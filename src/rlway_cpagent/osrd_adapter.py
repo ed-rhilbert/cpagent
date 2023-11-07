@@ -43,18 +43,18 @@ def regulation_problem_from_osrd(osrd: OSRD) -> CpRegulationProblem:
 
     problem = CpRegulationProblem(len(trains), len(zones))
 
-    for train_idx in range(len(trains)):
+    for train_idx, _ in enumerate(trains):
         prev_step = -1
         for zone in ref_schedule.trajectory(train_idx):
             problem.add_step(
-                train_idx,
-                zones.index(zone),
-                prev_step,
-                int(starts.loc[zone][train_idx]),
-                int(ends.loc[zone][train_idx]),
-                int(delayed_ends.loc[zone][train_idx])
+                train=train_idx,
+                zone=zones.index(zone),
+                prev_idx=prev_step,
+                min_arrival=int(starts.loc[zone][train_idx]),
+                min_departure=int(ends.loc[zone][train_idx]),
+                min_duration=int(delayed_ends.loc[zone][train_idx])
                 - int(delayed_starts.loc[zone][train_idx]),
-                True if osrd.stop_positions[train_idx][zone]['offset']
+                is_fixed=True if osrd.stop_positions[train_idx][zone]['offset']
                 is None else False
             )
             prev_step = len(problem.steps) - 1

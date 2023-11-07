@@ -43,14 +43,14 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             the solution to the problem
         """
         model = cp_model.CpModel()
-        self.create_variables(model, problem)
-        self.create_constraints(model, problem)
-        self.create_objective(model, problem)
+        self._create_variables(model, problem)
+        self._create_constraints(model, problem)
+        self._create_objective(model, problem)
         solver = cp_model.CpSolver()
         status = solver.Solve(model)
-        return self.get_solution(solver, status, problem)
+        return self._get_solution(solver, status, problem)
 
-    def create_variables(
+    def _create_variables(
             self,
             model: cp_model.CpModel,
             problem: CpRegulationProblem) -> None:
@@ -91,7 +91,7 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
                 f"departures[{i}]")
             for i, step in enumerate(problem.steps)]
 
-    def create_constraints(
+    def _create_constraints(
             self,
             model: cp_model.CpModel,
             problem: CpRegulationProblem) -> None:
@@ -104,10 +104,10 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         problem : CpRegulationProblem
             problem to solve
         """
-        self.add_spacing_constraints(model, problem)
-        self.add_chaining_constraints(model, problem)
+        self._add_spacing_constraints(model, problem)
+        self._add_chaining_constraints(model, problem)
 
-    def add_spacing_constraints(
+    def _add_spacing_constraints(
             self,
             model: cp_model.CpModel,
             problem: CpRegulationProblem) -> None:
@@ -127,7 +127,7 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
                 if step['zone'] == zone_idx
             ])
 
-    def add_chaining_constraints(
+    def _add_chaining_constraints(
             self,
             model: cp_model.CpModel,
             problem: CpRegulationProblem) -> None:
@@ -145,7 +145,7 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             if step['prev'] != -1:
                 model.Add(self.arrivals[i] == self.departures[step['prev']])
 
-    def create_objective(
+    def _create_objective(
             self,
             model: cp_model.CpModel,
             problem: CpRegulationProblem) -> None:
@@ -163,7 +163,7 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             for i, step in enumerate(problem.steps)
         ]))
 
-    def get_solution(
+    def _get_solution(
             self,
             solver: cp_model.CpSolver,
             ortoos_status,
