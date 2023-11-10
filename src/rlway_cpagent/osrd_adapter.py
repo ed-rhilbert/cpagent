@@ -6,7 +6,7 @@ from an osrd format to a constraint programming format
 from typing import Any, Dict, List
 
 from rlway.pyosrd.osrd import OSRD
-from rlway.schedules import schedule_from_osrd
+from rlway.schedules import Schedule, schedule_from_osrd
 
 from rlway_cpagent.regulation_solver import (
     CpRegulationProblem,
@@ -92,3 +92,76 @@ def osrd_stops_from_solution(
             "duration": delay["duration"]
         })
     return stops
+
+
+def regulation_problem_from_schedule(
+        ref_schedule: Schedule, delayed_schedule) -> CpRegulationProblem:
+    """Convert a schedule into a CpRegulationProblem
+    TODO for now, all steps are unfixed
+
+    Parameters
+    ----------
+    schedule : Schedule
+        Input schedule
+
+    Returns
+    -------
+    CpRegulationProblem
+        problem in CpRegulationProblem format
+    """
+    zones = ref_schedule.blocks
+    trains = ref_schedule.trains
+
+    starts = ref_schedule.starts
+    ends = ref_schedule.ends
+
+    delayed_starts = delayed_schedule.starts
+    delayed_ends = delayed_schedule.ends
+
+    problem = CpRegulationProblem(len(trains), len(zones))
+
+    for train_idx, _ in enumerate(trains):
+        prev_step = -1
+        for zone in ref_schedule.trajectory(train_idx):
+            problem.add_step(
+                train=train_idx,
+                zone=zones.index(zone),
+                prev_idx=prev_step,
+                min_arrival=int(starts.loc[zone][train_idx]),
+                min_departure=int(ends.loc[zone][train_idx]),
+                min_duration=int(delayed_ends.loc[zone][train_idx])
+                - int(delayed_starts.loc[zone][train_idx]),
+                is_fixed=False
+            )
+            prev_step = len(problem.steps) - 1
+
+    return problem
+
+
+def schedule_from_solution(solution: CpRegulationSolution) -> Schedule:
+    """Generate a regulated Schedule from a CpRegulationSolution
+
+    Parameters
+    ----------
+    solution : CpRegulationSolution
+        The solution returned by the cp solver
+
+    Returns
+    -------
+    Schedule
+        The regulated Shchedule
+    """
+    regulated_schedule = Schedule(
+        solution.problem.nb_zones,
+        solution.problem.nb_trains)
+
+    if solution.status == OptimisationStatus.FAILED:
+        return None
+
+    for step_idx, step in enumerate(solution.problem.steps):
+        regulated_schedule.set(
+            step['train'],
+            step['zone'],
+            (solution.arrivals[step_idx], solution.departures[step_idx]))
+
+    return regulated_schedule
