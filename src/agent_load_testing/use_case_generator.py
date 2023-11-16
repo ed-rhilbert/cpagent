@@ -4,6 +4,9 @@ import numpy as np
 
 from rlway.schedules import Schedule
 
+from rlway_cpagent.osrd_adapter import regulation_problem_from_schedule
+from rlway_cpagent.regulation_solver import CpRegulationProblem
+
 
 TRAIN_SPWAN_INTERVAL = 10
 STEP_DURATION = 10
@@ -17,7 +20,7 @@ GEOMETRIC_PROBA = 0.2
 
 def generate_use_case(
         nb_stations: int,
-        nb_trains: int) -> tuple[Schedule, Schedule]:
+        nb_trains: int) -> CpRegulationProblem:
     """Generate a rlway use case in a Schedule format
 
     A station is defined by NB_PLATFORM parallel tracks links to
@@ -85,13 +88,13 @@ def generate_use_case(
             delayed_start = delayed_start + STEP_DURATION + delay
             delay = 0
 
-    return ref_schedule, delayed_schedule
+    return regulation_problem_from_schedule(ref_schedule, delayed_schedule)
 
 
 def generate_garage_use_case(
         nb_stations: int,
         nb_trains: int,
-        delay_proba: float = 0.2) -> tuple[Schedule, Schedule]:
+        delay_proba: float = 0.2) -> CpRegulationProblem:
     nb_tracks_in_station = NB_PLATFORM + NB_CONNECTING_TRACKS
     nb_zones = nb_stations * nb_tracks_in_station + nb_trains + 1
     nb_tracks_in_garage = nb_trains + 1
@@ -130,4 +133,4 @@ def generate_garage_use_case(
             ref_start = ref_start + STEP_DURATION
             delayed_start = delayed_start + STEP_DURATION + zone_delay
 
-    return ref_schedule, delayed_schedule
+    return regulation_problem_from_schedule(ref_schedule, delayed_schedule)

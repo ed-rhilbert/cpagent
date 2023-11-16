@@ -40,6 +40,6 @@ class OrtoolsAgent(Agent):
             _description_
         """
         problem = regulation_problem_from_osrd(osrd)
-        solver = OrtoolsRegulationSolver(SOLVER_TIMEOUT)
+        solver = OrtoolsRegulationSolver("ortools", SOLVER_TIMEOUT)
         solution = solver.solve(problem)
         return osrd_stops_from_solution(osrd, solution)

@@ -124,3 +124,18 @@ def use_case_straight_line_2t():
     problem.add_step(1, 1, 2, 20, 30, 10, False)
 
     yield problem
+
+
+@pytest.fixture(scope='session')
+def use_case_empty_zone():
+    """Generate a use case with empty zone
+    """
+    problem = CpRegulationProblem(2, 3)
+
+    problem.add_step(0, 0, -1, 0, 10, 10, False)
+    problem.add_step(0, 1, 0, 10, 20, 20, False)
+
+    problem.add_step(1, 0, -1, 10, 20, 10, False)
+    problem.add_step(1, 1, 2, 20, 30, 10, False)
+
+    yield problem

@@ -14,7 +14,9 @@ array[1..N_steps] of int: min_arrival; % Min arrival time of a step
 array[1..N_steps] of int: min_departure; % Min departure time of a step
 array[1..N_steps] of int: min_duration; % Min duration of a step
 
-array[1..N_steps] of bool: is_fixed;
+array[1..N_steps] of bool: is_fixed; % True if a step is fixed
+
+set of 1..N_zones: active_zones; % set of zones associated with at least one step
 
 % Variables
 
@@ -24,7 +26,7 @@ array[1..N_steps] of var int: departure; % Departure time of a step
 % Constraints
 
 % 1. Two trains shouldn't collide 
-constraint forall(z in 1..N_zones)(
+constraint forall(z in active_zones)(
   disjunctive(
     [arrival[s] | s in 1..N_steps where zone[s] == z], 
     [departure[s] - arrival[s] | s in 1..N_steps where zone[s] == z])

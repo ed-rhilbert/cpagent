@@ -1,28 +1,68 @@
+from typing import List, Callable
 from itertools import product
 import time
-
-from rlway_cpagent.osrd_adapter import regulation_problem_from_schedule, schedule_from_solution
-from rlway_cpagent.regulation_solver import CpRegulationSolver
-
+import pandas as pd
 from tqdm.auto import tqdm
 
+from rlway_cpagent.regulation_solver import CpRegulationSolver
 
-def load_testing(
-        solver: CpRegulationSolver,
-        generator,
-        max_nb_stations: int,
-        max_nb_trains: int):
 
-    nb_stations_instances = list(range(1, max_nb_stations + 1))
-    nb_trains_instances = list(range(1, max_nb_trains + 1))
+def matrix_load_testing(
+        solvers: List[CpRegulationSolver],
+        generator: Callable,
+        ranges: dict) -> pd.DataFrame:
 
-    performances = []
+    data = []
 
-    for nb_stations, nb_trains in tqdm(product(nb_stations_instances, nb_trains_instances)):
-        ref_schedule, delayed_schedule = generator(nb_stations, nb_trains)
-        problem = regulation_problem_from_schedule(ref_schedule, delayed_schedule)
-        start_time = time.time()
-        solver.solve(problem)
-        end_time = time.time() - start_time
-        performances.append((nb_stations, nb_trains, end_time))
-    return performances
+    for problem_size in tqdm(product(*ranges.values())):
+        problem = generator(**dict(zip(ranges.keys(), problem_size)))
+        solver_computation_times = []
+        for solver in solvers:
+            start_time = time.time()
+            solver.solve(problem)
+            computation_time = time.time() - start_time
+            solver_computation_times.append(computation_time)
+        data.append((*problem_size, *solver_computation_times))
+
+    df = pd.DataFrame(
+        data=data,
+        columns=list(ranges.keys())
+        + [solver.solver_name for solver in solvers])
+
+    return df
+
+
+def linear_load_testing(
+        solvers: List[CpRegulationSolver],
+        generator: Callable,
+        ranges: dict) -> pd.DataFrame:
+
+    data = []
+
+    nominal_size = {
+        parameter: values["nominal"] for parameter, values in ranges.items()}
+    problem_sizes = [
+        {
+            **nominal_size,
+            parameter_name: size
+        }
+        for parameter_name, values in ranges.items()
+        for size in values['range']
+    ]
+
+    for problem_size in problem_sizes:
+        problem = generator(**problem_size)
+        solver_computation_times = []
+        for solver in solvers:
+            start_time = time.time()
+            solver.solve(problem)
+            computation_time = time.time() - start_time
+            solver_computation_times.append(computation_time)
+        data.append((*problem_size.values(), *solver_computation_times))
+
+    df = pd.DataFrame(
+        data=data,
+        columns=list(ranges.keys())
+        + [solver.solver_name for solver in solvers])
+
+    return df

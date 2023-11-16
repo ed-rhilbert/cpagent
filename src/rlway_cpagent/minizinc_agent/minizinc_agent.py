@@ -31,6 +31,6 @@ class MinizincAgent(Agent):
         """Solve a regulation problem
         """
         problem = regulation_problem_from_osrd(osrd)
-        solver = MinizincRegulationSolver(SOLVER, SOLVER_TIMEOUT)
+        solver = MinizincRegulationSolver("minizinc", SOLVER, SOLVER_TIMEOUT)
         solution = solver.solve(problem)
         return osrd_stops_from_solution(osrd, solution)

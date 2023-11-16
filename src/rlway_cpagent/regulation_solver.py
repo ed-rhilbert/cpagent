@@ -183,11 +183,13 @@ class CpRegulationSolution:
         return self.cost >= other.cost
 
 
+@dataclass
 class CpRegulationSolver(ABC):
     """
     Abstract class representing a constraint programming solver
     for the regulation problem
     """
+    solver_name: str
 
     @abstractmethod
     def solve(self, problem: CpRegulationProblem) -> CpRegulationSolution:
