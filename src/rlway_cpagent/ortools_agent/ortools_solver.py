@@ -23,13 +23,19 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         cp_model.INFEASIBLE: OptimisationStatus.FAILED
     }
 
-    def __init__(self, solver_name: str, max_optimization_time: int) -> None:
+    def __init__(
+            self,
+            solver_name: str,
+            max_optimization_time: int,
+            save_history: bool = False) -> None:
         super().__init__(solver_name)
         self.max_optimization_time = max_optimization_time
+        self.save_history = save_history
         self.arrivals = None
         self.departures = None
         self.durations = None
         self.intervals = None
+        self.history = None
 
     def solve(self, problem: CpRegulationProblem) -> CpRegulationSolution:
         """Solves a cp regulation problem using the solver CP-SAT of ortools
@@ -45,12 +51,14 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             the solution to the problem
         """
         model = cp_model.CpModel()
+        self.history = []
         self._create_variables(model, problem)
         self._create_constraints(model, problem)
         self._create_objective(model, problem)
         solver = cp_model.CpSolver()
         solver.parameters.max_time_in_seconds = self.max_optimization_time
-        status = solver.Solve(model)
+        status = solver.Solve(
+            model, HistoryHandler(self) if self.save_history else None)
         return self._get_solution(solver, status, problem)
 
     def _create_variables(
@@ -194,3 +202,21 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             int(solver.ObjectiveValue()),
             solver.Values(self.arrivals).to_list(),
             solver.Values(self.departures).to_list())
+
+
+class HistoryHandler(cp_model.CpSolverSolutionCallback):
+
+    def __init__(self, solver: OrtoolsRegulationSolver):
+        cp_model.CpSolverSolutionCallback.__init__(self)
+        self.solver = solver
+
+    def on_solution_callback(self):
+        """Called each time a new best solution is found by the solver
+        """
+        self.solver.history.append(
+            (
+                self.UserTime(), 
+                self.ObjectiveValue(), 
+                self.BestObjectiveBound()
+            )
+        )

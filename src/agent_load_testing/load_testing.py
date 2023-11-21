@@ -66,3 +66,30 @@ def linear_load_testing(
         + [solver.solver_name for solver in solvers])
 
     return df
+
+
+def load_testing(
+        solvers: List[CpRegulationSolver],
+        generator: Callable,
+        sizes: List[dict],
+        output_path: str = None) -> pd.DataFrame:
+
+    df = pd.DataFrame([], columns=list(sizes[0].keys()) +
+                      [solver.solver_name for solver in solvers],
+                      dtype=object)
+    if output_path is not None:
+        df.to_csv(output_path, mode='w', index=False)
+
+    for i, problem_size in enumerate(sizes):
+        problem = generator(**problem_size)
+        solver_computation_times = []
+        for solver in solvers:
+            start_time = time.time()
+            solver.solve(problem)
+            computation_time = time.time() - start_time
+            solver_computation_times.append(computation_time)
+        df.loc[i] = (*problem_size.values(), *solver_computation_times)
+        if output_path is not None:
+            df.to_csv(output_path, mode='w', index=False)
+
+    return df
