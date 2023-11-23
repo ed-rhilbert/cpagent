@@ -1,67 +1,61 @@
 
-# RLWay CPAgent
+# Prerequisites
 
-Regulation agent using constraint programming
+## Python >= 3.10
 
-**Author**: Charles Pombet (charles.pombet@eurodecision.com)
+## Java 17
 
-**Release**: October, 2023
-
-## Features
-
-RLWay CPAgent offers following functionalities :
-
-+ 1
-
-+ 2
-
-Installation
-------------
-
-To install rlway_cpagent :
-
-1. Make sure your `~/config/pip/pip.conf` file contais a reference to `packages.fr.eurodecision.com/nexus/...`. If not, type :
+### Install on Ubuntu
 
 ```bash
-pip config set global.trusted-host "pypi.org packages.fr.eurodecision.com"
-pip config set global.extra-index-url https://packages.fr.eurodecision.com/nexus/repository/pypi-ed/simple
+sudo apt update && sudo apt upgrade -y
+sudo apt install openjdk-17-jdk openjdk-17-jre
 ```
+### Install on Windows
 
-2. type
+https://www.oracle.com/java/technologies/downloads/#java17
+
+## SSH keys to access github.com
+
+https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
+
+# For users
+
+## Installation
+
 ```bash
-pip install rlway-cpagent 
+    pip install git+ssh://git@github.com:ed-rhilbert/cpagent.git
 ```
-Usage
------
+or
 
-Import the package
-
-```python3
->>> import rlway_cpagent
+```bash
+pip install --upgrade git+ssh://git@github.com:ed-rhilbert/cpagent.git
 ```
 
-Run from command line
+## Getting started
 
 ```python3
-rlway_cpagent
+>>> from rlway.pyosrd import OSRD
+>>> from rlway_cpagent.cp_agent import CPAgent
+>>> sim = OSRD(use_case='point_switch', dir='point_switch')
+>>> regulated = sim.regulate(agent=CPAgent("cp_agent"))
 ```
 
+## Custom Java binary path
 
-Documentation
--------------
+Create a file name `.env` at the root of your projet, containing 
+```bash
+JAVA="<Your custon Java Path>"
+```
+On Windows, it is recommanded to use triple double quotes (especially if the path contains spaces), e.g.:
+```bash
+JAVA="""C:\Program Files\Common Files\Oracle\Java\javapath\java"""
+```
+# For contributors
 
-```python3
-cd rlway-cpagent
+```bash
+git clone git@github.com:ed-rhilbert/cpagent.git
+python3 -m venv venv
+. venv/bin/activate
 pip install -r requirements.txt
-pip install -e .
-make docs
 ```
-
-will build and open the html documentation.
-
-
-Contributing to RLWay CPAgent
----------------------------------------------
-
-All bug reports, bug fixes, documentation improvements, enhancements, and ideas are welcome at [](https://github.com/chpombet/rlway-cpagent/issues)
-
