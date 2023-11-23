@@ -22,7 +22,7 @@ class MinizincRegulationSolver(CpRegulationSolver):
     A regulation solver using minizinc interface
     """
 
-    solver_name: str
+    minizinc_solver_name: str
     max_optimisation_time: int
 
     status_map = {
@@ -47,7 +47,7 @@ class MinizincRegulationSolver(CpRegulationSolver):
         model = Model(
             resource_filename("rlway_cpagent.minizinc_agent.models",
                               "zone_model.mzn"))
-        solver = Solver.lookup(self.solver_name)
+        solver = Solver.lookup(self.minizinc_solver_name)
         instance = Instance(solver, model)
         self._fill_instance(instance, problem)
         result = instance.solve(
@@ -78,6 +78,8 @@ class MinizincRegulationSolver(CpRegulationSolver):
         instance["min_departure"] = problem.get_min_departures()
         instance["min_duration"] = problem.get_min_durations()
         instance["is_fixed"] = problem.get_is_fixed()
+        instance["active_zones"] = \
+            set([zone+1 for zone in problem.get_zone_associations()])
 
     def _get_solution_from_result(
             self,

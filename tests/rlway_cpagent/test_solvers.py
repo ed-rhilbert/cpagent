@@ -11,8 +11,10 @@ from rlway_cpagent.utils import check_solution_validity
 
 
 @pytest.mark.parametrize("use_case,solver", [
-    ("use_case_cp_4_zones_switch", OrtoolsRegulationSolver(30)),
-    ("use_case_delay_conv", MinizincRegulationSolver("gecode", 30))])
+    ("use_case_cp_4_zones_switch",
+     OrtoolsRegulationSolver("ortools", 30)),
+    ("use_case_delay_conv",
+     MinizincRegulationSolver("minizinc", "gecode", 30))])
 def test_solver_feasible(use_case, solver, request):
     """Test the validity of a solution returned by
     the solver minizinc for the use case use_case_cp_4_zones_switch
@@ -22,8 +24,8 @@ def test_solver_feasible(use_case, solver, request):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsRegulationSolver(30),
-    MinizincRegulationSolver("gecode", 30)])
+    OrtoolsRegulationSolver("ortools", 30),
+    MinizincRegulationSolver("minizinc", "gecode", 30)])
 def test_solver_simple(solver, use_case_straight_line_2t):
     """Testing minizinc solver on a simple use case
     """
@@ -37,10 +39,21 @@ def test_solver_simple(solver, use_case_straight_line_2t):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsRegulationSolver(30),
-    MinizincRegulationSolver("gecode", 30)])
+    OrtoolsRegulationSolver("ortools", 30),
+    MinizincRegulationSolver("minizinc", "gecode", 30)])
 def test_solver_infeasible(solver, use_case_infeasible):
     """Test minizinc solver with infeasible problem
     """
     solution = solver.solve(use_case_infeasible)
     assert solution.status == OptimisationStatus.FAILED
+
+
+@pytest.mark.parametrize("solver", [
+    OrtoolsRegulationSolver("ortools", 30),
+    MinizincRegulationSolver("minizinc", "gecode", 30)])
+def test_solver_empty_zone(solver, use_case_empty_zone):
+    """Test that solvers can deal with zones with no
+    associated train
+    """
+    solution = solver.solve(use_case_empty_zone)
+    assert check_solution_validity(solution)

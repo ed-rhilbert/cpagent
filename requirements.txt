@@ -18,8 +18,11 @@ docutils==0.19
 pylint
 flake8
 
+# load testing
+tqdm
 
-
+# viz
+seaborn
 
 # tests
 pytest
