@@ -3,14 +3,16 @@
 import shutil
 
 import pytest
+import pandas as pd
 
 from rlway.pyosrd import OSRD
+from rlway.schedules import Schedule
 from rlway_cpagent.regulation_solver import CpRegulationProblem
 
 
-# ---------------------------------------------------------------------------- #
-#                                OSRD use cases                                #
-# ---------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+#                                OSRD use cases                               #
+# --------------------------------------------------------------------------- #
 
 
 @pytest.fixture(scope='session')
@@ -26,11 +28,46 @@ def osrd_point_switch():
     osrd.add_delay('train0', 0, 400.)
     yield osrd
     shutil.rmtree('tmp', ignore_errors=True)
+    
+
+# --------------------------------------------------------------------------- #
+#                              Schedule use cases                             #
+# --------------------------------------------------------------------------- #
 
 
-# ---------------------------------------------------------------------------- #
-#                         CpRegulationProblem use cases                        #
-# ---------------------------------------------------------------------------- #
+@pytest.fixture(scope='session')
+def schedule_straight_line_2t():
+    """Generate a simple use case with a straight line of 2 tracks
+    and two trains with a delay on the first train
+
+    Yields
+    ------
+    _type_
+        _description_
+    """
+    ref_schedule = Schedule(2, 2)
+    delayed_schedule = Schedule(2, 2)
+    
+    ref_schedule.set(0, 0, (0, 10))
+    ref_schedule.set(0, 1, (10, 20))
+    ref_schedule.set(1, 0, (10, 20))
+    ref_schedule.set(1, 1, (20, 30))
+    
+    delayed_schedule.set(0, 0, (0, 10))
+    delayed_schedule.set(0, 1, (10, 30))
+    delayed_schedule.set(1, 0, (10, 20))
+    delayed_schedule.set(1, 1, (20, 30))
+
+    fixed_steps = pd.DataFrame(
+        [[True, False], [False, False]],
+        [0, 1])
+
+    yield ref_schedule, delayed_schedule, fixed_steps
+
+
+# --------------------------------------------------------------------------- #
+#                        CpRegulationProblem use cases                        #
+# --------------------------------------------------------------------------- #
 
 
 @pytest.fixture(scope='session')

@@ -1,8 +1,14 @@
 import pytest
 
+from copy import deepcopy
+
+from pandas.testing import assert_frame_equal
+
 from rlway_cpagent.osrd_adapter import (
     regulation_problem_from_osrd,
     osrd_stops_from_solution,
+    regulation_problem_from_schedule,
+    schedule_from_solution,
 )
 from rlway_cpagent.regulation_solver import (
     CpRegulationProblem,
@@ -80,3 +86,39 @@ def test_osrd_stops_from_solution_invalid_stop(osrd_point_switch):
 
     with pytest.raises(Exception):
         osrd_stops_from_solution(osrd_point_switch, solution)
+
+
+def test_regulation_problem_from_schedule(schedule_straight_line_2t):
+    cp_problem = regulation_problem_from_schedule(*schedule_straight_line_2t)
+
+    oracle_problem = CpRegulationProblem(2, 2)
+    oracle_problem.add_step(0, 0, -1, 0, 10, 10, True)
+    oracle_problem.add_step(0, 1, 0, 10, 20, 20, False)
+    oracle_problem.add_step(1, 0, -1, 10, 20, 10, False)
+    oracle_problem.add_step(1, 1, 2, 20, 30, 10, False)
+
+    assert cp_problem.__dict__ == oracle_problem.__dict__
+
+
+def test_schedule_from_solution(schedule_straight_line_2t):
+    cp_problem = regulation_problem_from_schedule(*schedule_straight_line_2t)
+    solution = CpRegulationSolution(
+        cp_problem,
+        OptimisationStatus.OPTIMAL,
+        0,
+        [0, 10, 10, 30],
+        [10, 30, 30, 40])
+
+    ref_schedule = schedule_straight_line_2t[0]
+    regulated_schedule = schedule_from_solution(ref_schedule, solution)
+
+    oracle_regulated = deepcopy(schedule_straight_line_2t[1])
+    oracle_regulated.set(1, 0, [10, 30])
+    oracle_regulated.set(1, 1, [30, 40])
+
+    assert (regulated_schedule.durations
+            == oracle_regulated.durations).all().all()
+    assert (regulated_schedule.starts
+            == oracle_regulated.starts).all().all()
+    assert (regulated_schedule.ends
+            == oracle_regulated.ends).all().all()

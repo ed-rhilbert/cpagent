@@ -4,33 +4,38 @@ Provides a rlway agent using a constraint programming solver
 
 from typing import Any, Dict, List
 
-from rlway.pyosrd.osrd import OSRD
-from rlway.pyosrd.agents import Agent
+import pandas as pd
+
+from rlway.pyosrd.scheduler_agent import SchedulerAgent
 
 from rlway_cpagent.minizinc_agent.minizinc_solver import (
     MinizincRegulationSolver,
 )
 from rlway_cpagent.osrd_adapter import (
-    regulation_problem_from_osrd,
-    osrd_stops_from_solution,
+    regulation_problem_from_schedule,
+    schedule_from_solution,
+    extra_delays_from_regulated,
 )
 
 SOLVER = "gecode"
 SOLVER_TIMEOUT = 30
 
 
-class MinizincAgent(Agent):
+class MinizincAgent(SchedulerAgent):
     """
-    A regulation agent using a constraint programming solver
+    A regulation agent using a Minizinc constraint programming solver
     """
 
-    def stops(self, osrd: OSRD) -> List[Dict[str, Any]]:
-        return self._solve_cp_problem(osrd)
-
-    def _solve_cp_problem(self, osrd: OSRD):
-        """Solve a regulation problem
-        """
-        problem = regulation_problem_from_osrd(osrd)
+    @property
+    def steps_extra_delays(self) -> pd.DataFrame:
+        problem = regulation_problem_from_schedule(
+            self.initial_schedule,
+            self.delayed_schedule,
+            self.step_has_fixed_duration)
         solver = MinizincRegulationSolver("minizinc", SOLVER, SOLVER_TIMEOUT)
         solution = solver.solve(problem)
-        return osrd_stops_from_solution(osrd, solution)
+        regulated_schedule = schedule_from_solution(
+            self.initial_schedule, solution)
+        extra_delays = extra_delays_from_regulated(
+            self.delayed_schedule, regulated_schedule)
+        return extra_delays
