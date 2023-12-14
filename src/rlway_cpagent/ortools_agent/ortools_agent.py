@@ -4,42 +4,37 @@ Provides a rlway agent using a constraint programming solver
 
 from typing import Any, Dict, List
 
-from rlway.pyosrd.osrd import OSRD
-from rlway.pyosrd.agents import Agent
+import pandas as pd
+
+from rlway.pyosrd.scheduler_agent import SchedulerAgent
 
 from rlway_cpagent.ortools_agent.ortools_solver import (
     OrtoolsRegulationSolver,
 )
 from rlway_cpagent.osrd_adapter import (
-    regulation_problem_from_osrd,
-    osrd_stops_from_solution,
+    regulation_problem_from_schedule,
+    schedule_from_solution,
+    extra_delays_from_regulated,
 )
 
 SOLVER_TIMEOUT = 30
 
 
-class OrtoolsAgent(Agent):
+class OrtoolsAgent(SchedulerAgent):
     """
     A regulation agent using a constraint programming solver
     """
 
-    def stops(self, osrd: OSRD) -> List[Dict[str, Any]]:
-        return self._solve_cp_problem(osrd)
-
-    def _solve_cp_problem(self, osrd: OSRD):
-        """Solve a regulation problem
-
-        Parameters
-        ----------
-        osrd : OSRD
-            _description_
-
-        Returns
-        -------
-        _type_
-            _description_
-        """
-        problem = regulation_problem_from_osrd(osrd)
+    @property
+    def steps_extra_delays(self) -> pd.DataFrame:
+        problem = regulation_problem_from_schedule(
+            self.initial_schedule,
+            self.delayed_schedule,
+            self.step_has_fixed_duration)
         solver = OrtoolsRegulationSolver("ortools", SOLVER_TIMEOUT)
         solution = solver.solve(problem)
-        return osrd_stops_from_solution(osrd, solution)
+        regulated_schedule = schedule_from_solution(
+            self.initial_schedule, solution)
+        extra_delays = extra_delays_from_regulated(
+            self.delayed_schedule, regulated_schedule)
+        return extra_delays

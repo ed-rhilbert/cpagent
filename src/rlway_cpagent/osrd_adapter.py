@@ -4,6 +4,8 @@ from an osrd format to a constraint programming format
 """
 
 from typing import Any, Dict, List
+import copy
+import pandas as pd
 
 from rlway.pyosrd.osrd import OSRD
 from rlway.schedules import Schedule, schedule_from_osrd
@@ -95,19 +97,24 @@ def osrd_stops_from_solution(
 
 
 def regulation_problem_from_schedule(
-        ref_schedule: Schedule, delayed_schedule) -> CpRegulationProblem:
-    """Convert a schedule into a CpRegulationProblem
-    TODO for now, all steps are unfixed
+        ref_schedule: Schedule,
+        delayed_schedule: Schedule,
+        fixed_durations: pd.DataFrame) -> CpRegulationProblem:
+    """Convert a problem from a schedule format to a CpRegulationProblem
 
     Parameters
     ----------
-    schedule : Schedule
-        Input schedule
+    ref_schedule : Schedule
+        reference Schedule
+    delayed_schedule : Schedule
+        delayed Schedule
+    fixed_durations : pd.DataFrame
+        steps that are fixed
 
     Returns
     -------
     CpRegulationProblem
-        problem in CpRegulationProblem format
+        problem in a CpRegulationProblem format
     """
     zones = ref_schedule.blocks
     trains = ref_schedule.trains
@@ -131,29 +138,32 @@ def regulation_problem_from_schedule(
                 min_departure=int(ends.loc[zone][train_idx]),
                 min_duration=int(delayed_ends.loc[zone][train_idx])
                 - int(delayed_starts.loc[zone][train_idx]),
-                is_fixed=False
+                is_fixed=fixed_durations.loc[zone][train_idx]
             )
             prev_step = len(problem.steps) - 1
 
     return problem
 
 
-def schedule_from_solution(solution: CpRegulationSolution) -> Schedule:
+def schedule_from_solution(
+        ref_schedule: Schedule, 
+        solution: CpRegulationSolution) -> Schedule:
     """Generate a regulated Schedule from a CpRegulationSolution
 
     Parameters
     ----------
+    ref_schedule : Schedule
+        ref schedule
     solution : CpRegulationSolution
-        The solution returned by the cp solver
+        cp solution
 
     Returns
     -------
     Schedule
-        The regulated Shchedule
+        regulated schedule
     """
-    regulated_schedule = Schedule(
-        solution.problem.nb_zones,
-        solution.problem.nb_trains)
+    regulated_schedule = copy.deepcopy(ref_schedule)
+    zones = regulated_schedule.blocks
 
     if solution.status == OptimisationStatus.FAILED:
         return None
@@ -161,7 +171,30 @@ def schedule_from_solution(solution: CpRegulationSolution) -> Schedule:
     for step_idx, step in enumerate(solution.problem.steps):
         regulated_schedule.set(
             step['train'],
-            step['zone'],
+            zones[step['zone']],
             (solution.arrivals[step_idx], solution.departures[step_idx]))
 
     return regulated_schedule
+
+
+def extra_delays_from_regulated(
+        delayed_schedule: Schedule,
+        regulated_schedule: Schedule) -> pd.DataFrame:
+    """Convert from delayed and regulated schedule to extra delays
+
+    Parameters
+    ----------
+    delayed_schedule : Schedule
+        delayed schedule
+    regulated_schedule : Schedule
+        regulated schedule
+
+    Returns
+    -------
+    pd.DataFrame
+        extra delays
+    """
+    extra_delays = regulated_schedule.durations - delayed_schedule.durations
+    extra_delays = extra_delays.fillna(0).astype(int)
+    return extra_delays
+
