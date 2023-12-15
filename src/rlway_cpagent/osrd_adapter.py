@@ -99,7 +99,8 @@ def osrd_stops_from_solution(
 def regulation_problem_from_schedule(
         ref_schedule: Schedule,
         delayed_schedule: Schedule,
-        fixed_durations: pd.DataFrame) -> CpRegulationProblem:
+        fixed_durations: pd.DataFrame,
+        weights: pd.DataFrame) -> CpRegulationProblem:
     """Convert a problem from a schedule format to a CpRegulationProblem
 
     Parameters
@@ -110,6 +111,8 @@ def regulation_problem_from_schedule(
         delayed Schedule
     fixed_durations : pd.DataFrame
         steps that are fixed
+    weights : pd.DataFrame
+        weight for each step
 
     Returns
     -------
@@ -138,7 +141,8 @@ def regulation_problem_from_schedule(
                 min_departure=int(ends.loc[zone][train_idx]),
                 min_duration=int(delayed_ends.loc[zone][train_idx])
                 - int(delayed_starts.loc[zone][train_idx]),
-                is_fixed=fixed_durations.loc[zone][train_idx]
+                is_fixed=fixed_durations.loc[zone][train_idx],
+                ponderation=int(weights.loc[zone][train_idx])
             )
             prev_step = len(problem.steps) - 1
 

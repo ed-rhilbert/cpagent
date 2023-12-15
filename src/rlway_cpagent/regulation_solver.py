@@ -20,7 +20,8 @@ class CpRegulationProblem:
         self.steps = []
 
     def add_step(self, train: int, zone: int, prev_idx: int, min_arrival: int,
-                 min_departure: int, min_duration: int, is_fixed: bool):
+                 min_departure: int, min_duration: int, is_fixed: bool,
+                 ponderation: int = 1):
         """Add a step to the regulation problem
 
         Parameters
@@ -39,6 +40,8 @@ class CpRegulationProblem:
             min duration of the step
         is_fixed : bool
             true if the arrival time must match the min_arrival
+        ponderation : float
+            The step ponderation in the objective function
         """
         self.steps.append({
             "train": train,
@@ -47,7 +50,8 @@ class CpRegulationProblem:
             "min_arrival": min_arrival,
             "min_departure": min_departure,
             "min_duration": min_duration,
-            "is_fixed": is_fixed
+            "is_fixed": is_fixed,
+            "ponderation": ponderation
         })
 
     def get_train_associations(self) -> List[int]:
@@ -120,6 +124,16 @@ class CpRegulationProblem:
         """
         return [step['is_fixed'] for step in self.steps]
 
+    def get_ponderations(self) -> List[float]:
+        """Return the ponderation of each step
+
+        Returns
+        -------
+        List[float]
+            List of ponderations
+        """
+        return [step['ponderation'] for step in self.steps]
+
 
 class OptimisationStatus(Enum):
     """
@@ -138,7 +152,7 @@ class CpRegulationSolution:
 
     problem: CpRegulationProblem
     status: OptimisationStatus
-    cost: int
+    cost: float
     arrivals: List[int]
     departures: List[int]
 

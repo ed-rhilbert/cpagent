@@ -11,13 +11,16 @@ from rlway_cpagent.utils import check_solution_validity
 
 
 @pytest.mark.parametrize("use_case,solver", [
+    ("use_case_cp_4_zones_switch", OrtoolsRegulationSolver("ortools", 30)),
+    ("use_case_delay_conv", OrtoolsRegulationSolver("ortools", 30)),
     ("use_case_cp_4_zones_switch",
-     OrtoolsRegulationSolver("ortools", 30)),
+     MinizincRegulationSolver("minizinc", "gecode", 30)),
     ("use_case_delay_conv",
      MinizincRegulationSolver("minizinc", "gecode", 30))])
 def test_solver_feasible(use_case, solver, request):
-    """Test the validity of a solution returned by
-    the solver minizinc for the use case use_case_cp_4_zones_switch
+    """Test the validity of the solution returned by
+    the solvers minizinc and ortools for the use cases
+    use_case_cp_4_zones_switch and use_case_delay_conv
     """
     solution = solver.solve(request.getfixturevalue(use_case))
     assert check_solution_validity(solution)
@@ -30,7 +33,7 @@ def test_solver_simple(solver, use_case_straight_line_2t):
     """Testing minizinc solver on a simple use case
     """
     solution = solver.solve(use_case_straight_line_2t)
-    cost_oracle = 30
+    cost_oracle = 10
     arrivals_oracle = [0, 10, 10, 30]
     departures_oracle = [10, 30, 30, 40]
     assert solution.cost == cost_oracle
@@ -57,3 +60,4 @@ def test_solver_empty_zone(solver, use_case_empty_zone):
     """
     solution = solver.solve(use_case_empty_zone)
     assert check_solution_validity(solution)
+

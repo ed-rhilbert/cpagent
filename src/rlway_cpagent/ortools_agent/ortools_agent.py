@@ -30,7 +30,8 @@ class OrtoolsAgent(SchedulerAgent):
         problem = regulation_problem_from_schedule(
             self.initial_schedule,
             self.delayed_schedule,
-            self.step_has_fixed_duration)
+            self.step_has_fixed_duration,
+            self.weights)
         solver = OrtoolsRegulationSolver("ortools", SOLVER_TIMEOUT)
         solution = solver.solve(problem)
         regulated_schedule = schedule_from_solution(
