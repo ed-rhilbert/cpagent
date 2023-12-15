@@ -23,7 +23,6 @@ def test_solver_feasible(use_case, solver, request):
     use_case_cp_4_zones_switch and use_case_delay_conv
     """
     solution = solver.solve(request.getfixturevalue(use_case))
-    print(solution.cost)
     assert check_solution_validity(solution)
 
 
@@ -61,3 +60,4 @@ def test_solver_empty_zone(solver, use_case_empty_zone):
     """
     solution = solver.solve(use_case_empty_zone)
     assert check_solution_validity(solution)
+

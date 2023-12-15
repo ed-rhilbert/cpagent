@@ -61,8 +61,12 @@ def schedule_straight_line_2t():
     fixed_steps = pd.DataFrame(
         [[True, False], [False, False]],
         [0, 1])
+    
+    weights = pd.DataFrame(
+        [[1, 1], [1, 1]],
+        [0, 1])
 
-    yield ref_schedule, delayed_schedule, fixed_steps
+    yield ref_schedule, delayed_schedule, fixed_steps, weights
 
 
 # --------------------------------------------------------------------------- #
