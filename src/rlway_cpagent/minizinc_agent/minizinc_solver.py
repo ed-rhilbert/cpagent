@@ -6,6 +6,8 @@ from datetime import timedelta
 from dataclasses import dataclass
 from pkg_resources import resource_filename
 
+import nest_asyncio
+
 from minizinc import Model, Solver, Instance, Result, Status
 
 from rlway_cpagent.regulation_solver import (
@@ -14,6 +16,8 @@ from rlway_cpagent.regulation_solver import (
     OptimisationStatus,
     CpRegulationSolver,
 )
+
+nest_asyncio.apply()
 
 
 @dataclass
