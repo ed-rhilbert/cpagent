@@ -23,6 +23,8 @@ class OrtoolsAgent(SchedulerAgent):
     A regulation agent using a constraint programming solver
     """
 
+    allow_change_order = True
+
     @property
     def steps_extra_delays(self) -> pd.DataFrame:
         problem = regulation_problem_from_schedule(
@@ -30,7 +32,8 @@ class OrtoolsAgent(SchedulerAgent):
             self.delayed_schedule,
             self.step_has_fixed_duration,
             self.weights)
-        solver = OrtoolsRegulationSolver("ortools", SOLVER_TIMEOUT)
+        solver = OrtoolsRegulationSolver("ortools", SOLVER_TIMEOUT, False,
+                                         self.allow_change_order)
         solution = solver.solve(problem)
         regulated_schedule = schedule_from_solution(
             self.initial_schedule, solution)

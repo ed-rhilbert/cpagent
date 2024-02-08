@@ -17,6 +17,8 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
     Solve a regulation problem using ortools
     """
 
+    allow_change_order = True
+
     status_map = {
         cp_model.OPTIMAL: OptimisationStatus.OPTIMAL,
         cp_model.FEASIBLE: OptimisationStatus.SUBOPTIMAL,
@@ -27,10 +29,12 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             self,
             solver_name: str,
             max_optimization_time: int,
-            save_history: bool = False) -> None:
+            save_history: bool = False,
+            allow_change_order: bool = True) -> None:
         super().__init__(solver_name)
         self.max_optimization_time = max_optimization_time
         self.save_history = save_history
+        self.allow_change_order = allow_change_order
         self.arrivals = None
         self.departures = None
         self.durations = None
@@ -117,6 +121,8 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         """
         self._add_spacing_constraints(model, problem)
         self._add_chaining_constraints(model, problem)
+        if not self.allow_change_order:
+            self._add_enforce_order_constraints(model, problem)
 
     def _add_spacing_constraints(
             self,
@@ -156,6 +162,16 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
             if step['prev'] != -1:
                 model.Add(self.arrivals[i] == self.departures[step['prev']]
                           - step['overlap'])
+
+    def _add_enforce_order_constraints(
+            self,
+            model: cp_model.CpModel,
+            problem: CpRegulationProblem
+    ) -> None:
+        for i, step in enumerate(problem.steps):
+            for j, other in enumerate(problem.steps):
+                if step['min_arrival'] < other['min_arrival'] and step['zone'] == other['zone']:
+                    model.Add(self.arrivals[i] < self.arrivals[j])
 
     def _create_objective(
             self,
