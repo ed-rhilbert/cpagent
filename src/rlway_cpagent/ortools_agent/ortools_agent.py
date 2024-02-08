@@ -2,8 +2,6 @@
 Provides a rlway agent using a constraint programming solver
 """
 
-from typing import Any, Dict, List
-
 import pandas as pd
 
 from rlway.pyosrd.scheduler_agent import SchedulerAgent
