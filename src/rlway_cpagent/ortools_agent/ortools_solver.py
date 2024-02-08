@@ -154,7 +154,8 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
         """
         for i, step in enumerate(problem.steps):
             if step['prev'] != -1:
-                model.Add(self.arrivals[i] == self.departures[step['prev']])
+                model.Add(self.arrivals[i] == self.departures[step['prev']]
+                          - step['overlap'])
 
     def _create_objective(
             self,
@@ -216,8 +217,8 @@ class HistoryHandler(cp_model.CpSolverSolutionCallback):
         """
         self.solver.history.append(
             (
-                self.UserTime(), 
-                self.ObjectiveValue(), 
+                self.UserTime(),
+                self.ObjectiveValue(),
                 self.BestObjectiveBound()
             )
         )

@@ -47,7 +47,12 @@ def regulation_problem_from_osrd(osrd: OSRD) -> CpRegulationProblem:
 
     for train_idx, _ in enumerate(trains):
         prev_step = -1
+        prev_zone = None
         for zone in ref_schedule.trajectory(train_idx):
+            overlap = 0
+            if prev_zone is not None:
+                overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
+                              - delayed_starts.loc[zone][train_idx]))
             problem.add_step(
                 train=train_idx,
                 zone=zones.index(zone),
@@ -57,8 +62,10 @@ def regulation_problem_from_osrd(osrd: OSRD) -> CpRegulationProblem:
                 min_duration=int(delayed_ends.loc[zone][train_idx])
                 - int(delayed_starts.loc[zone][train_idx]),
                 is_fixed=True if osrd.stop_positions[train_idx][zone]['offset']
-                is None else False
+                is None else False,
+                overlap=overlap
             )
+            prev_zone = zone
             prev_step = len(problem.steps) - 1
 
     return problem
@@ -132,7 +139,12 @@ def regulation_problem_from_schedule(
 
     for train_idx, _ in enumerate(trains):
         prev_step = -1
+        prev_zone = None
         for zone in ref_schedule.trajectory(train_idx):
+            overlap = 0
+            if prev_zone is not None:
+                overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
+                              - delayed_starts.loc[zone][train_idx]))
             problem.add_step(
                 train=train_idx,
                 zone=zones.index(zone),
@@ -142,15 +154,17 @@ def regulation_problem_from_schedule(
                 min_duration=int(delayed_ends.loc[zone][train_idx])
                 - int(delayed_starts.loc[zone][train_idx]),
                 is_fixed=fixed_durations.loc[zone][train_idx],
-                ponderation=int(weights.loc[zone][train_idx])
+                ponderation=int(weights.loc[zone][train_idx]),
+                overlap=overlap
             )
+            prev_zone = zone
             prev_step = len(problem.steps) - 1
 
     return problem
 
 
 def schedule_from_solution(
-        ref_schedule: Schedule, 
+        ref_schedule: Schedule,
         solution: CpRegulationSolution) -> Schedule:
     """Generate a regulated Schedule from a CpRegulationSolution
 

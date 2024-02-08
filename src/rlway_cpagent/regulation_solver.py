@@ -21,7 +21,7 @@ class CpRegulationProblem:
 
     def add_step(self, train: int, zone: int, prev_idx: int, min_arrival: int,
                  min_departure: int, min_duration: int, is_fixed: bool,
-                 ponderation: int = 1):
+                 ponderation: int = 1, overlap: int = 0):
         """Add a step to the regulation problem
 
         Parameters
@@ -51,7 +51,8 @@ class CpRegulationProblem:
             "min_departure": min_departure,
             "min_duration": min_duration,
             "is_fixed": is_fixed,
-            "ponderation": ponderation
+            "ponderation": ponderation,
+            "overlap": overlap
         })
 
     def get_train_associations(self) -> List[int]:
