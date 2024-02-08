@@ -52,7 +52,7 @@ The following data are retrieved from the results of an OSRD simulation.
 
 We minimize the sum of departure delays
 
-$$\text{minimize} 
+$$\text{minimize}
 \sum_{s \in\\{1,..,N_{steps}\\}}^{}\left(
 departure_s - min\_departure_s
 \right)
@@ -60,7 +60,7 @@ $$
 
 ## Constraints
 
-1. Two trains shouldn't collide 
+1. Two trains shouldn't collide
 
 $$\forall s_1, s_2 \in \{1,..,N_{steps}\} \; s.t. \; arrival_{s_1} < arrival_{s_1}, \\
 arrival_{s_1} \geq departure_{s_2} \lor departure_{s_1} \leq arrival_{s_2}$$
@@ -88,6 +88,6 @@ $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; is\_fixed_s = True, \\departure_s 
 
 $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s \neq 0, \\arrival_s = departure_{prev_s}$$
 
-6. On the first step, arrival must be equal to the reference ($min_arrival$)
+6. On the first step, arrival must be equal to the reference ($min_{arrival}$)
 
 $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s = 0, arrival_s = min\_arrival_s$$
