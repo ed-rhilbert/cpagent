@@ -1,6 +1,6 @@
 # Constraint Programming Model
 
-version = v1.0.0
+version = v1.1.0
 
 ## Description
 
@@ -16,10 +16,12 @@ A train trajectory is composed of a succession of **steps**, each step being def
 
 Given an original valid timetable and a delay, the goal of the model is to find the best values for the times at which trains enter/leave the zones, that minimize the total induced delay, under the constraints that
 - the trains follow their trajectories, i.e. a given succession of steps,
+  - A train can be in multiple zones at the same time (for example its head can be in a zone while its tail is in another zone). The time between the entry of a train in a zone and the exit from the precedent zone is computed based on the valid timetable.
 - two trains can not be in the same zone at the same time,
 - the trains can not go faster than a reference given by a standalone base simulation,
 - trains can stop at stations, decelerate in blocks between stations,
 - trains can not stop or decelerate on switches.
+- OPTIONAL : trains cannot overtake
 
 ## Input data
 
@@ -54,7 +56,7 @@ We minimize the sum of departure delays
 
 $$\text{minimize}
 \sum_{s \in\\{1,..,N_{steps}\\}}^{}\left(
-departure_s - min\_departure_s
+arrival_s - min\_arrival_s
 \right)
 $$
 
@@ -84,10 +86,15 @@ $$\forall s \in \{1,..,N_{steps}\}, departure_s - arrival_s \geq min\_duration_s
 
 $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; is\_fixed_s = True, \\departure_s - arrival_s = min\_duration_s$$
 
-5. The arrival time at a step is equal to the departure time of the prev step
+5. The arrival time at a step is equal to the departure time of the prev step minus the overlap computed from the valid timetable.
 
-$$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s \neq 0, \\arrival_s = departure_{prev_s}$$
+$$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s \neq 0, \\arrival_s = departure_{prev_s} - overlap_ s$$
 
-6. On the first step, arrival must be equal to the reference ($min_{arrival}$)
+6. On the first step, arrival must be equal to the reference ($min\_arrival$)
 
 $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s = 0, arrival_s = min\_arrival_s$$
+
+7. _OPTIONAL_ A train cannot overtake another train (we use the reference ($min\_arrival$) to determine the order of trains)
+
+$$\forall s1, s2 \in \{1,...,N_{steps}\}\;s.t.\;  min\_arrival_{s1} < min\_arrival_{s2},\\
+arrival_{s1} < arrival_{s2}$$
