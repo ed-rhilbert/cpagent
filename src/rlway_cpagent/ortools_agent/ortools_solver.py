@@ -17,8 +17,6 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
     Solve a regulation problem using ortools
     """
 
-    allow_change_order = True
-
     status_map = {
         cp_model.OPTIMAL: OptimisationStatus.OPTIMAL,
         cp_model.FEASIBLE: OptimisationStatus.SUBOPTIMAL,
@@ -170,7 +168,10 @@ class OrtoolsRegulationSolver(CpRegulationSolver):
     ) -> None:
         for i, step in enumerate(problem.steps):
             for j, other in enumerate(problem.steps):
-                if step['min_arrival'] < other['min_arrival'] and step['zone'] == other['zone']:
+                if (
+                    step['min_arrival'] < other['min_arrival']
+                    and step['zone'] == other['zone']
+                ):
                     model.Add(self.arrivals[i] < self.arrivals[j])
 
     def _create_objective(
