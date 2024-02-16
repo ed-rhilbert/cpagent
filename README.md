@@ -15,17 +15,6 @@ sudo apt install openjdk-17-jdk openjdk-17-jre
 
 https://www.oracle.com/java/technologies/downloads/#java17
 
-## Minizinc
-### Install on Ubuntu
-
-```bash
-snap install minizinc --classic
-```
-
-### Install on Windows
-
-https://www.minizinc.org/ide/
-
 ## SSH keys to access github.com
 
 https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account
@@ -55,7 +44,7 @@ pip install --upgrade git+ssh://git@github.com/ed-rhilbert/cpagent.git
 
 ## Custom Java binary path
 
-Create a file name `.env` at the root of your projet, containing 
+Create a file name `.env` at the root of your projet, containing
 ```bash
 JAVA="<Your custon Java Path>"
 ```

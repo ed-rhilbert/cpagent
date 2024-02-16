@@ -28,23 +28,6 @@ SSH keys to access github.com
 
 `Add a new ssh key to your github account <https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account>`_
 
-Minizinc >= 2.9.6
-"""""""""""""""""
-
-For Windows
-````````````
-
-You can download the installer `here <https://www.minizinc.org/>`_.
-Then ensure that the **Minizinc** executable is located in a folder in the **$PATH** environmental variable.
-
-For Linux
-``````````
-
-.. code:: bash
-
-    snap install minizinc --classic
-
-
 Package installation
 --------------------
 

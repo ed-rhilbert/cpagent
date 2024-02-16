@@ -106,8 +106,8 @@ def osrd_stops_from_solution(
 def regulation_problem_from_schedule(
         ref_schedule: Schedule,
         delayed_schedule: Schedule,
-        fixed_durations: pd.DataFrame,
-        weights: pd.DataFrame) -> CpRegulationProblem:
+        fixed_durations: pd.DataFrame = None,
+        weights: pd.DataFrame = None) -> CpRegulationProblem:
     """Convert a problem from a schedule format to a CpRegulationProblem
 
     Parameters
@@ -145,6 +145,18 @@ def regulation_problem_from_schedule(
             if prev_zone is not None:
                 overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
                               - delayed_starts.loc[zone][train_idx]))
+            is_fixed = (
+                True
+                if (fixed_durations is not None
+                    and fixed_durations.loc[zone][train_idx])
+                else False
+            )
+            ponderation = (
+                1
+                if weights is None
+                else weights.loc[zone][train_idx]
+            )
+
             problem.add_step(
                 train=train_idx,
                 zone=zones.index(zone),
@@ -153,8 +165,8 @@ def regulation_problem_from_schedule(
                 min_departure=int(ends.loc[zone][train_idx]),
                 min_duration=int(delayed_ends.loc[zone][train_idx])
                 - int(delayed_starts.loc[zone][train_idx]),
-                is_fixed=fixed_durations.loc[zone][train_idx],
-                ponderation=int(weights.loc[zone][train_idx]),
+                is_fixed=is_fixed,
+                ponderation=ponderation,
                 overlap=overlap
             )
             prev_zone = zone

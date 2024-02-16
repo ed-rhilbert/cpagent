@@ -88,7 +88,8 @@ def generate_use_case(
             delayed_start = delayed_start + STEP_DURATION + delay
             delay = 0
 
-    return regulation_problem_from_schedule(ref_schedule, delayed_schedule)
+    return regulation_problem_from_schedule(ref_schedule, delayed_schedule,
+                                            None, None)
 
 
 def generate_garage_use_case(
@@ -133,4 +134,5 @@ def generate_garage_use_case(
             ref_start = ref_start + STEP_DURATION
             delayed_start = delayed_start + STEP_DURATION + zone_delay
 
-    return regulation_problem_from_schedule(ref_schedule, delayed_schedule)
+    return regulation_problem_from_schedule(ref_schedule, delayed_schedule,
+                                            None, None)
