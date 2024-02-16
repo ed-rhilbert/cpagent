@@ -2,7 +2,6 @@ import pytest
 
 from copy import deepcopy
 
-from pandas.testing import assert_frame_equal
 
 from rlway_cpagent.osrd_adapter import (
     regulation_problem_from_osrd,
@@ -23,12 +22,12 @@ def test_regulation_problem_from_osrd(osrd_point_switch):
     cp_problem = regulation_problem_from_osrd(osrd_point_switch)
 
     oracle_problem = CpRegulationProblem(2, 4)
-    oracle_problem.add_step(0, 0, -1, 0, 242, 642, False)
-    oracle_problem.add_step(0, 1, 0, 236, 247, 11, True)
-    oracle_problem.add_step(0, 2, 1, 242, 450, 208, True)
-    oracle_problem.add_step(1, 3, -1, 100, 342, 242, False)
-    oracle_problem.add_step(1, 1, 3, 336, 347, 11, True)
-    oracle_problem.add_step(1, 0, 4, 342, 550, 208, True)
+    oracle_problem.add_step(0, 0, -1, 0, 242, 642, False, 1, 0)
+    oracle_problem.add_step(0, 1, 0, 236, 247, 11, True, 1, 5)
+    oracle_problem.add_step(0, 2, 1, 242, 450, 208, True, 1, 5)
+    oracle_problem.add_step(1, 3, -1, 100, 342, 242, False, 1, 0)
+    oracle_problem.add_step(1, 1, 3, 336, 347, 11, True, 1, 5)
+    oracle_problem.add_step(1, 0, 4, 342, 550, 208, True, 1, 5)
 
     assert cp_problem.__dict__ == oracle_problem.__dict__
 
