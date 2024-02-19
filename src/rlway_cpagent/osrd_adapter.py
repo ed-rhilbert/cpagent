@@ -175,9 +175,122 @@ def regulation_problem_from_schedule(
     return problem
 
 
+def build_step(train: int, zone: int, prev_idx: int, min_arrival: int,
+               min_departure: int, min_duration: int, is_fixed: bool,
+               ponderation: int = 1, overlap: int = 0) -> Dict:
+    """Add a step to the regulation problem
+
+    Parameters
+    ----------
+    train : int
+        index of the associated train
+    zone : int
+        index of the associated zone
+    prev_idx : int
+        index of the previous step
+    min_arrival : int
+        min arrival time of the step
+    min_departure : int
+        min departure time of the step
+    min_duration : int
+        min duration of the step
+    is_fixed : bool
+        true if the arrival time must match the min_arrival
+    ponderation : float
+        The step ponderation in the objective function
+    """
+    return {
+        "train": train,
+        "zone": zone,
+        "prev": prev_idx,
+        "min_arrival": min_arrival,
+        "min_departure": min_departure,
+        "min_duration": min_duration,
+        "is_fixed": is_fixed,
+        "ponderation": ponderation,
+        "overlap": overlap
+    }
+
+
+def steps_from_schedule(
+    ref_schedule: Schedule,
+    delayed_schedule: Schedule,
+    fixed_durations: pd.DataFrame = None,
+    weights: pd.DataFrame = None
+) -> List[Dict]:
+    """Convert a problem from a schedule format to a steps
+
+    Parameters
+    ----------
+    ref_schedule : Schedule
+        reference Schedule
+    delayed_schedule : Schedule
+        delayed Schedule
+    fixed_durations : pd.DataFrame
+        steps that are fixed
+    weights : pd.DataFrame
+        weight for each step
+
+    Returns
+    -------
+    CpRegulationProblem
+        problem in a CpRegulationProblem format
+    """
+    zones = ref_schedule.blocks
+    trains = ref_schedule.trains
+
+    starts = ref_schedule.starts
+    ends = ref_schedule.ends
+
+    delayed_starts = delayed_schedule.starts
+    delayed_ends = delayed_schedule.ends
+
+    steps = []
+
+    for train_idx, _ in enumerate(trains):
+        prev_step = -1
+        prev_zone = None
+        for zone in ref_schedule.trajectory(train_idx):
+            overlap = 0
+            if prev_zone is not None:
+                overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
+                              - delayed_starts.loc[zone][train_idx]))
+            is_fixed = (
+                True
+                if (fixed_durations is not None
+                    and fixed_durations.loc[zone][train_idx])
+                else False
+            )
+            ponderation = (
+                1
+                if weights is None
+                else weights.loc[zone][train_idx]
+            )
+
+            steps.append(build_step(
+                train=train_idx,
+                zone=zones.index(zone),
+                prev_idx=prev_step,
+                min_arrival=int(starts.loc[zone][train_idx]),
+                min_departure=int(ends.loc[zone][train_idx]),
+                min_duration=int(delayed_ends.loc[zone][train_idx])
+                - int(delayed_starts.loc[zone][train_idx]),
+                is_fixed=is_fixed,
+                ponderation=ponderation,
+                overlap=overlap
+            ))
+            prev_zone = zone
+            prev_step = len(steps) - 1
+
+    return steps
+
+
 def schedule_from_solution(
         ref_schedule: Schedule,
-        solution: CpRegulationSolution) -> Schedule:
+        status: OptimisationStatus,
+        steps: List[Dict],
+        arrivals: List[int],
+        departures: List[int]) -> Schedule:
     """Generate a regulated Schedule from a CpRegulationSolution
 
     Parameters
@@ -195,14 +308,14 @@ def schedule_from_solution(
     regulated_schedule = copy.deepcopy(ref_schedule)
     zones = regulated_schedule.blocks
 
-    if solution.status == OptimisationStatus.FAILED:
+    if status == OptimisationStatus.FAILED:
         return None
 
-    for step_idx, step in enumerate(solution.problem.steps):
+    for step_idx, step in enumerate(steps):
         regulated_schedule.set(
             step['train'],
             zones[step['zone']],
-            (solution.arrivals[step_idx], solution.departures[step_idx]))
+            (arrivals[step_idx], departures[step_idx]))
 
     return regulated_schedule
 

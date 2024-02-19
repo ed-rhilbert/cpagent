@@ -4,7 +4,7 @@ from rlway_cpagent.ortools_agent.ortools_solver import (
     OrtoolsRegulationSolver,
 )
 from rlway_cpagent.regulation_solver import OptimisationStatus
-from rlway_cpagent.utils import check_solution_validity
+from rlway_cpagent.utils import check_solution_validity, build_solution
 
 
 @pytest.mark.parametrize("use_case,solver", [
@@ -16,8 +16,12 @@ def test_solver_feasible(use_case, solver, request):
     the solvers and ortools for the use cases
     use_case_cp_4_zones_switch and use_case_delay_conv
     """
-    solution = solver.solve(request.getfixturevalue(use_case))
-    assert check_solution_validity(solution)
+    cp_solver, _ = solver.solve_from_steps(
+        request.getfixturevalue(use_case)[0],
+        request.getfixturevalue(use_case)[1],
+        request.getfixturevalue(use_case)[2]
+    )
+    assert check_solution_validity(build_solution(solver, cp_solver))
 
 
 @pytest.mark.parametrize("solver", [

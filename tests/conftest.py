@@ -8,6 +8,7 @@ import pandas as pd
 from rlway.pyosrd import OSRD
 from rlway.schedules import Schedule
 from rlway_cpagent.regulation_solver import CpRegulationProblem
+from rlway_cpagent.osrd_adapter import build_step
 
 
 # --------------------------------------------------------------------------- #
@@ -28,7 +29,7 @@ def osrd_point_switch():
     osrd.add_delay('train0', 0, 400.)
     yield osrd
     shutil.rmtree('tmp', ignore_errors=True)
-    
+
 
 # --------------------------------------------------------------------------- #
 #                              Schedule use cases                             #
@@ -47,12 +48,12 @@ def schedule_straight_line_2t():
     """
     ref_schedule = Schedule(2, 2)
     delayed_schedule = Schedule(2, 2)
-    
+
     ref_schedule.set(0, 0, (0, 10))
     ref_schedule.set(0, 1, (10, 20))
     ref_schedule.set(1, 0, (10, 20))
     ref_schedule.set(1, 1, (20, 30))
-    
+
     delayed_schedule.set(0, 0, (0, 10))
     delayed_schedule.set(0, 1, (10, 30))
     delayed_schedule.set(1, 0, (10, 20))
@@ -61,7 +62,7 @@ def schedule_straight_line_2t():
     fixed_steps = pd.DataFrame(
         [[True, False], [False, False]],
         [0, 1])
-    
+
     weights = pd.DataFrame(
         [[1, 1], [1, 1]],
         [0, 1])
@@ -83,17 +84,17 @@ def use_case_cp_4_zones_switch():
     CpRegulationProblem
         generated problem
     """
-    problem = CpRegulationProblem(nb_trains=2, nb_zones=4)
+    steps = []
 
-    problem.add_step(0, 0, -1, 0, 10, 20, False, 2)
-    problem.add_step(0, 2, 0, 10, 20, 10, True, 2)
-    problem.add_step(0, 3, 1, 20, 30, 10, False, 2)
+    steps.append(build_step(0, 0, -1, 0, 10, 20, False, 2))
+    steps.append(build_step(0, 2, 0, 10, 20, 10, True, 2))
+    steps.append(build_step(0, 3, 1, 20, 30, 10, False, 2))
 
-    problem.add_step(1, 1, -1, 20, 30, 10, False, 2)
-    problem.add_step(1, 2, 3, 30, 40, 10, True, 2)
-    problem.add_step(1, 3, 4, 40, 50, 10, False, 2)
+    steps.append(build_step(1, 1, -1, 20, 30, 10, False, 2))
+    steps.append(build_step(1, 2, 3, 30, 40, 10, True, 2))
+    steps.append(build_step(1, 3, 4, 40, 50, 10, False, 2))
 
-    yield problem
+    yield 4, 2, steps
 
 
 @pytest.fixture(scope='session')
@@ -108,21 +109,22 @@ def use_case_delay_conv():
     """
     delay_at_first_departure = 0
 
-    problem = CpRegulationProblem(nb_trains=2, nb_zones=7)
+    steps = []
 
-    problem.add_step(0, 0, -1, 0, 10, 10 + delay_at_first_departure, False, 1)
-    problem.add_step(0, 2, 0, 10, 20, 10, True, 1)
-    problem.add_step(0, 3, 1, 20, 30, 10, False, 1)
-    problem.add_step(0, 4, 2, 30, 40, 10, True, 1)
-    problem.add_step(0, 5, 3, 40, 50, 10, False, 1)
+    steps.append(build_step(0, 0, -1, 0, 10,
+                            10 + delay_at_first_departure, False, 1))
+    steps.append(build_step(0, 2, 0, 10, 20, 10, True, 1))
+    steps.append(build_step(0, 3, 1, 20, 30, 10, False, 1))
+    steps.append(build_step(0, 4, 2, 30, 40, 10, True, 1))
+    steps.append(build_step(0, 5, 3, 40, 50, 10, False, 1))
 
-    problem.add_step(1, 1, -1, 20, 30, 10, False, 1)
-    problem.add_step(1, 2, 5, 30, 40, 10, True, 1)
-    problem.add_step(1, 3, 6, 40, 50, 10, False, 1)
-    problem.add_step(1, 4, 6, 50, 60, 10, True, 1)
-    problem.add_step(1, 6, 8, 60, 70, 10, False, 1)
+    steps.append(build_step(1, 1, -1, 20, 30, 10, False, 1))
+    steps.append(build_step(1, 2, 5, 30, 40, 10, True, 1))
+    steps.append(build_step(1, 3, 6, 40, 50, 10, False, 1))
+    steps.append(build_step(1, 4, 6, 50, 60, 10, True, 1))
+    steps.append(build_step(1, 6, 8, 60, 70, 10, False, 1))
 
-    yield problem
+    yield 7, 2, steps
 
 
 @pytest.fixture(scope='session')
