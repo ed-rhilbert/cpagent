@@ -4,7 +4,7 @@ Provides a rlway agent using a constraint programming solver
 
 import pandas as pd
 
-from rlway.pyosrd.scheduler_agent import SchedulerAgent
+from pyosrd.agents.scheduler_agent import SchedulerAgent
 
 from rlway_cpagent.ortools_agent.ortools_solver import (
     OrtoolsRegulationSolver,
@@ -26,8 +26,7 @@ class OrtoolsAgent(SchedulerAgent):
 
     @property
     def steps_extra_delays(self) -> pd.DataFrame:
-        if self.extra_delays is None:
-            self.solve()
+        self.solve()
 
         return self.extra_delays
 

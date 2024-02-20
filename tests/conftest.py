@@ -5,8 +5,8 @@ import shutil
 import pytest
 import pandas as pd
 
-from rlway.pyosrd import OSRD
-from rlway.schedules import Schedule
+from pyosrd import OSRD
+from pyosrd.schedules import Schedule
 from rlway_cpagent.osrd_adapter import build_step
 
 

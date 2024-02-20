@@ -8,8 +8,8 @@ from typing import Dict, List
 import copy
 import pandas as pd
 
-from rlway.pyosrd.osrd import OSRD
-from rlway.schedules import Schedule, schedule_from_osrd
+from pyosrd.osrd import OSRD
+from pyosrd.schedules import Schedule, schedule_from_osrd
 
 
 class OptimisationStatus(Enum):

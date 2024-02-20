@@ -5,7 +5,7 @@ Implements a OrtoolsRegulationSolver using Ortools solver
 from ortools.sat.python import cp_model
 import pandas as pd
 
-from rlway.schedules import Schedule
+from pyosrd.schedules import Schedule
 
 from rlway_cpagent.osrd_adapter import (
     steps_from_schedule,
