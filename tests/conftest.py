@@ -7,7 +7,6 @@ import pandas as pd
 
 from rlway.pyosrd import OSRD
 from rlway.schedules import Schedule
-from rlway_cpagent.regulation_solver import CpRegulationProblem
 from rlway_cpagent.osrd_adapter import build_step
 
 
@@ -81,8 +80,9 @@ def use_case_cp_4_zones_switch():
 
     Yields
     ------
-    CpRegulationProblem
-        generated problem
+        nb_zones
+        nb_trains
+        steps
     """
     steps = []
 
@@ -104,8 +104,9 @@ def use_case_delay_conv():
 
     Yields
     ------
-    _type_
-        _description_
+        nb_zones
+        nb_trains
+        steps
     """
     delay_at_first_departure = 0
 
@@ -134,18 +135,19 @@ def use_case_infeasible():
 
     Yields
     ------
-    _type_
-        _description_
+        nb_zones
+        nb_trains
+        steps
     """
-    problem = CpRegulationProblem(nb_trains=2, nb_zones=2)
+    steps = []
 
-    problem.add_step(0, 0, -1, 0, 10, 30, False)
-    problem.add_step(0, 1, 0, 10, 20, 10, False)
+    steps.append(build_step(0, 0, -1, 0, 10, 30, False))
+    steps.append(build_step(0, 1, 0, 10, 20, 10, False))
 
-    problem.add_step(1, 0, -1, 10, 20, 10, False)
-    problem.add_step(1, 1, 0, 20, 30, 10, False)
+    steps.append(build_step(1, 0, -1, 10, 20, 10, False))
+    steps.append(build_step(1, 1, 0, 20, 30, 10, False))
 
-    yield problem
+    yield 2, 2, steps
 
 
 @pytest.fixture(scope='session')
@@ -155,30 +157,36 @@ def use_case_straight_line_2t():
 
     Yields
     ------
-    _type_
-        _description_
+        nb_zones
+        nb_trains
+        steps
     """
-    problem = CpRegulationProblem(2, 2)
+    steps = []
+    steps.append(build_step(0, 0, -1, 0, 10, 10, False))
+    steps.append(build_step(0, 1, 0, 10, 20, 20, False))
 
-    problem.add_step(0, 0, -1, 0, 10, 10, False)
-    problem.add_step(0, 1, 0, 10, 20, 20, False)
+    steps.append(build_step(1, 0, -1, 10, 20, 10, False))
+    steps.append(build_step(1, 1, 2, 20, 30, 10, False))
 
-    problem.add_step(1, 0, -1, 10, 20, 10, False)
-    problem.add_step(1, 1, 2, 20, 30, 10, False)
-
-    yield problem
+    yield 2, 2, steps
 
 
 @pytest.fixture(scope='session')
 def use_case_empty_zone():
     """Generate a use case with empty zone
+
+    Yields
+    ------
+        nb_zones
+        nb_trains
+        steps
     """
-    problem = CpRegulationProblem(2, 3)
+    steps = []
 
-    problem.add_step(0, 0, -1, 0, 10, 10, False)
-    problem.add_step(0, 1, 0, 10, 20, 20, False)
+    steps.append(build_step(0, 0, -1, 0, 10, 10, False))
+    steps.append(build_step(0, 1, 0, 10, 20, 20, False))
 
-    problem.add_step(1, 0, -1, 10, 20, 10, False)
-    problem.add_step(1, 1, 2, 20, 30, 10, False)
+    steps.append(build_step(1, 0, -1, 10, 20, 10, False))
+    steps.append(build_step(1, 1, 2, 20, 30, 10, False))
 
-    yield problem
+    yield 2, 3, steps

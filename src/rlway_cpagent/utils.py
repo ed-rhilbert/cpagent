@@ -14,8 +14,8 @@ class CpRegulationSolution:
     Description of a regulation solution
     """
 
-    nb_trains: int
     nb_zones: int
+    nb_trains: int
     steps: List[Dict]
     cost: float
     arrivals: List[int]
@@ -30,6 +30,12 @@ class CpRegulationSolution:
             list of delays
         """
         delays = []
+        if (
+            self.steps is None or
+            self.arrivals is None or
+            self.departures is None
+        ):
+            return delays
         for idx, step in enumerate(self.steps):
             duration = self.departures[idx] - self.arrivals[idx]
             delay = duration - step["min_duration"]

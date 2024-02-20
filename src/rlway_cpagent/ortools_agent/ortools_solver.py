@@ -1,8 +1,7 @@
 """
-Implements a CpRegulationSolver using Ortools solver
+Implements a OrtoolsRegulationSolver using Ortools solver
 """
 
-from enum import Enum
 from ortools.sat.python import cp_model
 import pandas as pd
 
@@ -11,16 +10,8 @@ from rlway.schedules import Schedule
 from rlway_cpagent.osrd_adapter import (
     steps_from_schedule,
     schedule_from_solution,
+    OptimisationStatus
 )
-
-
-class OptimisationStatus(Enum):
-    """
-    Enum representing the status of an optimisation
-    """
-    OPTIMAL = 1
-    SUBOPTIMAL = 2
-    FAILED = 3
 
 
 class OrtoolsRegulationSolver:
