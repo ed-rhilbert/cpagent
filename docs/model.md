@@ -151,3 +151,64 @@ $$
 $$
 \forall i \in {1,..., N_{steps}}\;\sum_{j\in \{j, zone_j = zone_i\}} prec_j^i + first_i = 1
 $$
+
+# Model adaptation to allow change of itinerary
+
+This approach would requires alternative paths known in advance for trains.
+For example we would know that a train could take on path or another one between two steps.
+
+## Input Data
+
+New data would be required to allow change of itinerary :
+
+**Sizes**
+- $N_o \in \mathbb{N}$ : The number of itinerary options
+- $N_{itineraries}^o \in \mathbb{N}$ : The number of itinieraries of the option o
+- $N_{steps}^i \in \mathbb{N}$ : The number of steps of an itinerary
+
+**Itinerary**
+- $S^i \subset \mathbb{N}$ : All steps in the itinerary $i$
+- $i^i \in \{0,1\}$ : boolean that tells us if the itinerary is taken or not
+- $I^o \subset \mathbb{N}$ : all the itineraries in the option $o$
+- $active_s \in \{0,1\}$ : boolean that tells us if the step is activated (part of a selected itinerary).
+
+## Constraits
+
+A lot of constraints are modified from the original ones. New constraints are indexed by letters while modified one use the same numbering than previously.
+
+An effort must be taken to give every information even for alternative itineraries.
+
+### New constraints
+A. One itinerary must be taken for each options
+$$\forall o \in {1,...,N_o}\; \sum_{i\in I^o} i^i = 1
+$$
+
+B. A step is active if and only if the itinerary it belongs to is selected.
+
+$$\forall o \in {1,...,N_o}\; \forall i\in I^o, \forall s \in S^i \;\\
+active_s = i^i
+$$
+
+### Modified constraints
+
+1. Two trains shouldn't collide
+
+$$\forall s_1, s_2 \in \{1,..,N_{steps}\} \; s.t. \; arrival_{s_1} < arrival_{s_1}\; s.t. \; active_{s_1} = active_{s_1} = 1, \\
+arrival_{s_1} \geq departure_{s_2} \lor departure_{s_1} \leq arrival_{s_2}$$
+
+7. _OPTIONAL_ A train cannot overtake another train (we use the reference ($min\_arrival$) to determine the order of trains)
+
+$$\forall s1, s2 \in \{1,...,N_{steps}\}\;\\
+s.t.\;  min\_arrival_{s1} < min\_arrival_{s2}\; \\
+s.t. \; active_{s_1} = active_{s_1} = 1,\\
+arrival_{s1} < arrival_{s2}$$
+
+## Objective
+
+To handle different itineraries it will be required to update the objective function to only account for active steps.
+
+$$\text{minimize}
+\sum_{s \in\\{1,..,N_{steps}\\}}^{}\left(
+arrival_s - min\_arrival_s
+\right)\times active_s
+$$
