@@ -39,7 +39,7 @@ class OrtoolsAgent(SchedulerAgent):
         )
 
         regulated_schedule = solver.solve(
-            self.initial_schedule,
+            self.ref_schedule,
             self.delayed_schedule,
             self.step_has_fixed_duration,
             self.weights
