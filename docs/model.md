@@ -52,7 +52,7 @@ The following data are retrieved from the results of an OSRD simulation.
 
 ## Objective
 
-We minimize the sum of departure delays
+We minimize the sum of arrival delays
 
 $$\text{minimize}
 \sum_{s \in\\{1,..,N_{steps}\\}}^{}\left(
@@ -64,7 +64,7 @@ $$
 
 1. Two trains shouldn't collide
 
-$$\forall s_1, s_2 \in \{1,..,N_{steps}\} \; s.t. \; arrival_{s_1} < arrival_{s_1}, \\
+$$\forall s_1, s_2 \in \{1,..,N_{steps}\} \; s.t. \; zone_{s_1} = zone_{s_2}, \\
 arrival_{s_1} \geq departure_{s_2} \lor departure_{s_1} \leq arrival_{s_2}$$
 
 2. A step cannot overtake its reference
