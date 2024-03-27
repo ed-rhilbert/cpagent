@@ -35,7 +35,7 @@ pip install --upgrade git+ssh://git@github.com/ed-rhilbert/cpagent.git
 ## Getting started
 
 ```python3
->>> from rlway.pyosrd.osrd import OSRD
+>>> from pyosrd.osrd import OSRD
 >>> from rlway_cpagent.ortools_agent.ortools_agent import OrtoolsAgent
 >>> sim = OSRD(use_case='station_capacity2', dir='tmp')
 >>> sim.add_delay('train0', time_threshold=150, delay=800.)

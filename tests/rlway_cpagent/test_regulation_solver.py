@@ -1,15 +1,13 @@
-from rlway_cpagent.regulation_solver import (
-    CpRegulationSolution,
-    OptimisationStatus,
-)
+from rlway_cpagent.utils import CpRegulationSolution
 
 
 def test_get_delays(use_case_straight_line_2t):
     """Testing the function get_delays of the class CpRegulationSolution
     """
     solution = CpRegulationSolution(
-        use_case_straight_line_2t,
-        OptimisationStatus.OPTIMAL,
+        use_case_straight_line_2t[0],
+        use_case_straight_line_2t[1],
+        use_case_straight_line_2t[2],
         0,
         [0, 10, 10, 30],
         [10, 30, 30, 40])
@@ -30,9 +28,10 @@ def test_get_delays_empty(use_case_straight_line_2t):
     with an empty solution
     """
     solution = CpRegulationSolution(
-        use_case_straight_line_2t,
-        OptimisationStatus.FAILED,
-        None,
+        use_case_straight_line_2t[0],
+        use_case_straight_line_2t[1],
+        use_case_straight_line_2t[2],
+        0,
         None,
         None)
 
