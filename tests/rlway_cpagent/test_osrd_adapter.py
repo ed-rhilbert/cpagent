@@ -17,12 +17,12 @@ def test_regulation_problem_from_osrd(osrd_point_switch):
 
     oracle_steps = []
 
-    oracle_steps.append(build_step(0, 0, -1, 0, 242, 642, False, 1, 0))
-    oracle_steps.append(build_step(0, 1, 0, 236, 247, 11, True, 1, 5))
-    oracle_steps.append(build_step(0, 2, 1, 242, 450, 208, True, 1, 5))
-    oracle_steps.append(build_step(1, 3, -1, 100, 342, 242, False, 1, 0))
-    oracle_steps.append(build_step(1, 1, 3, 336, 347, 11, True, 1, 5))
-    oracle_steps.append(build_step(1, 0, 4, 342, 550, 208, True, 1, 5))
+    oracle_steps.append(build_step("train0", 0, -1, 0, 242, 642, False, 1, 0))
+    oracle_steps.append(build_step("train0", 1, 0, 236, 247, 11, True, 1, 5))
+    oracle_steps.append(build_step("train0", 2, 1, 242, 449, 207, True, 1, 5))
+    oracle_steps.append(build_step("train1", 3, -1, 100, 342, 242, False, 1, 0)) # noqa
+    oracle_steps.append(build_step("train1", 1, 3, 336, 347, 11, True, 1, 5))
+    oracle_steps.append(build_step("train1", 0, 4, 342, 549, 207, True, 1, 5))
 
     assert oracle_steps == steps
 

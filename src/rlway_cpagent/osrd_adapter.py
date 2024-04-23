@@ -21,15 +21,15 @@ class OptimisationStatus(Enum):
     FAILED = 3
 
 
-def build_step(train: int, zone: int, prev_idx: int, min_arrival: int,
+def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
                min_departure: int, min_duration: int, is_fixed: bool,
                ponderation: int = 1, overlap: int = 0) -> Dict:
     """Add a step to the regulation problem
 
     Parameters
     ----------
-    train : int
-        index of the associated train
+    train : str
+        label of the associated train
     zone : int
         index of the associated zone
     prev_idx : int
@@ -109,7 +109,7 @@ def steps_from_schedule(
     List[Dict]
         A list of steps where information is stored in dictionnary
     """
-    zones = ref_schedule.blocks
+    zones = ref_schedule.zones
     trains = ref_schedule.trains
 
     starts = ref_schedule.starts
@@ -120,14 +120,14 @@ def steps_from_schedule(
 
     steps = []
 
-    for train_idx, _ in enumerate(trains):
+    for train_idx, train in enumerate(trains):
         prev_step = -1
         prev_zone = None
         for zone in ref_schedule.trajectory(train_idx):
             overlap = 0
             if prev_zone is not None:
-                overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
-                              - delayed_starts.loc[zone][train_idx]))
+                overlap = max(0, int(delayed_ends.loc[prev_zone][train]
+                              - delayed_starts.loc[zone][train]))
             is_fixed = (
                 True
                 if (fixed_durations is not None
@@ -137,17 +137,17 @@ def steps_from_schedule(
             ponderation = (
                 1
                 if weights is None
-                else weights.loc[zone][train_idx]
+                else weights.loc[zone][train]
             )
 
             steps.append(build_step(
-                train=train_idx,
+                train=train,
                 zone=zones.index(zone),
                 prev_idx=prev_step,
-                min_arrival=int(starts.loc[zone][train_idx]),
-                min_departure=int(ends.loc[zone][train_idx]),
-                min_duration=int(delayed_ends.loc[zone][train_idx])
-                - int(delayed_starts.loc[zone][train_idx]),
+                min_arrival=int(starts.loc[zone][train]),
+                min_departure=int(ends.loc[zone][train]),
+                min_duration=int(delayed_ends.loc[zone][train])
+                - int(delayed_starts.loc[zone][train]),
                 is_fixed=is_fixed,
                 ponderation=ponderation,
                 overlap=overlap
@@ -179,7 +179,7 @@ def schedule_from_solution(
         regulated schedule
     """
     regulated_schedule = copy.deepcopy(ref_schedule)
-    zones = regulated_schedule.blocks
+    zones = regulated_schedule.zones
 
     if status == OptimisationStatus.FAILED:
         return None
@@ -210,6 +210,12 @@ def extra_delays_from_regulated(
     pd.DataFrame
         extra delays
     """
-    extra_delays = regulated_schedule.durations - delayed_schedule.durations
+    if regulated_schedule is None:
+        extra_delays = delayed_schedule.durations * -1
+    else:
+        extra_delays = (
+            regulated_schedule.durations
+            - delayed_schedule.durations
+        )
     extra_delays = extra_delays.fillna(0).astype(int)
     return extra_delays

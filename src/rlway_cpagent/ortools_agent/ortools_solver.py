@@ -60,7 +60,7 @@ class OrtoolsRegulationSolver:
         """
 
         solver, status = self.solve_from_steps(
-            len(ref_schedule.blocks),
+            len(ref_schedule.zones),
             len(ref_schedule.trains),
             steps_from_schedule(ref_schedule, delayed_schedule,
                                 fixed_durations, weights)

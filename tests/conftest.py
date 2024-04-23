@@ -24,7 +24,7 @@ def osrd_point_switch():
     _type_
         _description_
     """
-    osrd = OSRD('tmp', 'point_switch')
+    osrd = OSRD('tmp', simulation='point_switch')
     osrd.add_delay('train0', 0, 400.)
     yield osrd
     shutil.rmtree('tmp', ignore_errors=True)
