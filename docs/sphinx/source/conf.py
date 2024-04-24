@@ -16,7 +16,7 @@ import sys
 from datetime import date
 
 # sys.path.insert(0, os.path.abspath('../..'))
-import rlway_cpagent
+import cpagent
 
 # -- Project information -----------------------------------------------------
 
@@ -25,8 +25,8 @@ copyright = f"2023-{date.today().year}, EURODECISION"
 author = 'EURODECISION'
 
 # The full version, including alpha/beta/rc tags
-version = rlway_cpagent.__version__
-release = rlway_cpagent.__version__
+version = cpagent.__version__
+release = cpagent.__version__
 
 # -- General configuration ---------------------------------------------------
 source_suffix = ['.rst', '.md']

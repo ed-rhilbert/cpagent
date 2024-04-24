@@ -7,7 +7,7 @@ import pandas as pd
 
 from pyosrd.schedules import Schedule
 
-from rlway_cpagent.osrd_adapter import (
+from cpagent.osrd_adapter import (
     steps_from_schedule,
     schedule_from_solution,
     OptimisationStatus

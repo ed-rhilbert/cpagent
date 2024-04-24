@@ -1,10 +1,10 @@
 import pytest
 
-from rlway_cpagent.ortools_agent.ortools_solver import (
+from cpagent.ortools_agent.ortools_solver import (
     OrtoolsRegulationSolver,
     OptimisationStatus
 )
-from rlway_cpagent.utils import check_solution_validity, build_solution
+from cpagent.utils import check_solution_validity, build_solution
 
 
 @pytest.mark.parametrize("use_case,solver", [

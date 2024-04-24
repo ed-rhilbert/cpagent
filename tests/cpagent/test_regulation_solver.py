@@ -1,4 +1,4 @@
-from rlway_cpagent.utils import CpRegulationSolution
+from cpagent.utils import CpRegulationSolution
 
 
 def test_get_delays(use_case_straight_line_2t):

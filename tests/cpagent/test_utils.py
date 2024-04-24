@@ -2,7 +2,7 @@
 Testing utils.py module
 """
 
-from rlway_cpagent.utils import (
+from cpagent.utils import (
     CpRegulationSolution,
     check_solution_validity,
     check_spacing,
