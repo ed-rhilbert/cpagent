@@ -6,10 +6,10 @@ import pandas as pd
 
 from pyosrd.agents.scheduler_agent import SchedulerAgent
 
-from rlway_cpagent.ortools_agent.ortools_solver import (
+from cpagent.ortools_agent.ortools_solver import (
     OrtoolsRegulationSolver,
 )
-from rlway_cpagent.osrd_adapter import (
+from cpagent.osrd_adapter import (
     extra_delays_from_regulated,
 )
 

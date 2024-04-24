@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 
-from rlway_cpagent.osrd_adapter import (
+from cpagent.osrd_adapter import (
     build_step,
     steps_from_osrd,
     steps_from_schedule,

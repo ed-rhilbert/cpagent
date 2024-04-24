@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
 
-from rlway_cpagent.ortools_agent.ortools_solver import OrtoolsRegulationSolver
+from cpagent.ortools_agent.ortools_solver import OrtoolsRegulationSolver
 
 
 @dataclass

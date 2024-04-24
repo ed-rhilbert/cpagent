@@ -1,4 +1,4 @@
-from rlway_cpagent.ortools_agent.ortools_agent import (
+from cpagent.ortools_agent.ortools_agent import (
     OrtoolsAgent,
 )
 
