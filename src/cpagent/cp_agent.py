@@ -47,6 +47,8 @@ class CpAgent(SchedulerAgent):
     max_optimization_time = SOLVER_TIMEOUT
     save_history = False
 
+    # solution
+
     status_map = {
         cp_model.OPTIMAL: OptimisationStatus.OPTIMAL,
         cp_model.FEASIBLE: OptimisationStatus.SUBOPTIMAL,

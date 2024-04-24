@@ -28,8 +28,8 @@ def _solve(
 
     Returns
     -------
-    CpRegulationSolution
-        the solution to the problem
+    Schedule
+        the refulated schedule
     """
 
     solver, status = self._solve_from_steps(

@@ -5,8 +5,7 @@ from cpagent.cp_agent import (
     OptimisationStatus,
 
 )
-from cpagent.solution import build_solution
-from .test_utils import check_solution_validity
+from .test_utils import check_solution_validity, build_solution
 
 
 @pytest.mark.parametrize("use_case,solver", [

@@ -164,14 +164,20 @@ def schedule_from_solution(
         steps: List[Dict],
         arrivals: List[int],
         departures: List[int]) -> Schedule:
-    """Generate a regulated Schedule from a CpRegulationSolution
+    """Generate a regulated Schedule from cp results
 
     Parameters
     ----------
     ref_schedule : Schedule
         ref schedule
-    solution : CpRegulationSolution
-        cp solution
+    status : OptimisationStatus
+        cp status of the optimize
+    steps : List[Dict]
+        the list of steps
+    arrivals : List[int]
+        time of arrivals
+    departures : List[int]
+        time of departures
 
     Returns
     -------

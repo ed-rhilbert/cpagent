@@ -1,4 +1,4 @@
-from cpagent.solution import CpRegulationSolution
+from .test_utils import CpRegulationSolution
 
 
 def test_get_delays(use_case_straight_line_2t):
