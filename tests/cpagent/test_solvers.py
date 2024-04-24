@@ -2,9 +2,11 @@ import pytest
 
 from cpagent.cp_agent import (
     CpAgent,
-    OptimisationStatus
+    OptimisationStatus,
+
 )
-from cpagent.utils import check_solution_validity, build_solution
+from cpagent.solution import build_solution
+from .test_utils import check_solution_validity
 
 
 @pytest.mark.parametrize("use_case,solver", [
