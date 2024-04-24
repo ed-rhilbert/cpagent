@@ -1,15 +1,15 @@
 import pytest
 
-from cpagent.ortools_agent.ortools_agent import (
-    OrtoolsAgent,
+from cpagent.ortools_agent.cp_agent import (
+    CpAgent,
     OptimisationStatus
 )
 from cpagent.utils import check_solution_validity, build_solution
 
 
 @pytest.mark.parametrize("use_case,solver", [
-    ("use_case_cp_4_zones_switch", OrtoolsAgent("ortools")),
-    ("use_case_delay_conv", OrtoolsAgent("ortools"))
+    ("use_case_cp_4_zones_switch", CpAgent("ortools")),
+    ("use_case_delay_conv", CpAgent("ortools"))
 ])
 def test_solver_feasible(use_case, solver, request):
     """Test the validity of the solution returned by
@@ -25,7 +25,7 @@ def test_solver_feasible(use_case, solver, request):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsAgent("ortools")
+    CpAgent("ortools")
 ])
 def test_solver_simple(solver, use_case_straight_line_2t):
     """Testing solver on a simple use case
@@ -45,7 +45,7 @@ def test_solver_simple(solver, use_case_straight_line_2t):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsAgent("ortools")
+    CpAgent("ortools")
 ])
 def test_solver_infeasible(solver, use_case_infeasible):
     """Test solver with infeasible problem
@@ -60,7 +60,7 @@ def test_solver_infeasible(solver, use_case_infeasible):
 
 
 @pytest.mark.parametrize("solver", [
-    OrtoolsAgent("ortools")
+    CpAgent("ortools")
 ])
 def test_solver_empty_zone(solver, use_case_empty_zone):
     """Test that solvers can deal with zones with no

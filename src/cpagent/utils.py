@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
 
-from cpagent.ortools_agent.ortools_agent import OrtoolsAgent
+from cpagent.ortools_agent.cp_agent import CpAgent
 
 
 @dataclass
@@ -48,7 +48,7 @@ class CpRegulationSolution:
 
 
 def build_solution(
-    solver: OrtoolsAgent,
+    solver: CpAgent,
     cp_solver: cp_model.CpSolver
 ) -> CpRegulationSolution:
     return CpRegulationSolution(

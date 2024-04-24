@@ -18,7 +18,7 @@ from cpagent.osrd_adapter import (
 SOLVER_TIMEOUT = 30
 
 
-class OrtoolsAgent(SchedulerAgent):
+class CpAgent(SchedulerAgent):
     """
     A regulation agent using a constraint programming solver
     """
