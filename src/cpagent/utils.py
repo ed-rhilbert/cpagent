@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from ortools.sat.python import cp_model
 
-from cpagent.ortools_agent.cp_agent import CpAgent
+from cpagent.cp_agent import CpAgent
 
 
 @dataclass

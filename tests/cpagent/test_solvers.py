@@ -1,6 +1,6 @@
 import pytest
 
-from cpagent.ortools_agent.cp_agent import (
+from cpagent.cp_agent import (
     CpAgent,
     OptimisationStatus
 )
