@@ -44,7 +44,7 @@ setuptools.setup(
     setup_requires=["wheel"],
     install_requires=[
         'ortools',
-        'rlway @ git+ssh://git@github.com/y-plus/RLway.git',
+        'pyosrd @ git+ssh://git@github.com/y-plus/pyosrd.git',
         'importlib-resources'
         ],
 )

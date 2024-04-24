@@ -2,113 +2,96 @@
 Provides adapting function transforming a regulation problem
 from an osrd format to a constraint programming format
 """
+from enum import Enum
 
-from typing import Any, Dict, List
+from typing import Dict, List
 import copy
 import pandas as pd
 
-from rlway.pyosrd.osrd import OSRD
-from rlway.schedules import Schedule, schedule_from_osrd
-
-from rlway_cpagent.regulation_solver import (
-    CpRegulationProblem,
-    CpRegulationSolution,
-    OptimisationStatus,
-)
+from pyosrd.osrd import OSRD
+from pyosrd.schedules import Schedule, schedule_from_osrd
 
 
-def regulation_problem_from_osrd(osrd: OSRD) -> CpRegulationProblem:
-    """Transform a regulation problem from osrd format to constraint
-    programming format
+class OptimisationStatus(Enum):
+    """
+    Enum representing the status of an optimisation
+    """
+    OPTIMAL = 1
+    SUBOPTIMAL = 2
+    FAILED = 3
+
+
+def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
+               min_departure: int, min_duration: int, is_fixed: bool,
+               ponderation: int = 1, overlap: int = 0) -> Dict:
+    """Add a step to the regulation problem
 
     Parameters
     ----------
-    osrd : OSRD
-        osrd simulation
-
-    Returns
-    -------
-    CpRegulationProblem
-        Constraint programming problem
+    train : str
+        label of the associated train
+    zone : int
+        index of the associated zone
+    prev_idx : int
+        index of the previous step
+    min_arrival : int
+        min arrival time of the step
+    min_departure : int
+        min departure time of the step
+    min_duration : int
+        min duration of the step
+    is_fixed : bool
+        true if the arrival time must match the min_arrival
+    ponderation : float
+        The step ponderation in the objective function
     """
+    return {
+        "train": train,
+        "zone": zone,
+        "prev": prev_idx,
+        "min_arrival": min_arrival,
+        "min_departure": min_departure,
+        "min_duration": min_duration,
+        "is_fixed": is_fixed,
+        "ponderation": ponderation,
+        "overlap": overlap
+    }
+
+
+def steps_from_osrd(
+    osrd: OSRD,
+    fixed_durations: pd.DataFrame = None,
+    weights: pd.DataFrame = None
+) -> List[Dict]:
     ref_schedule = schedule_from_osrd(osrd)
     delayed_schedule = schedule_from_osrd(osrd.delayed())
 
-    zones = ref_schedule.blocks
-    trains = ref_schedule.trains
+    if fixed_durations is None:
+        fixed_durations = pd.DataFrame()
+        trains = ref_schedule.trains
+        for train_idx, _ in enumerate(trains):
+            for zone in ref_schedule.trajectory(train_idx):
+                fixed_durations.loc[zone, train_idx] = (
+                    True
+                    if osrd.stop_positions[train_idx][zone]['offset'] is None
+                    else False
+                )
 
-    starts = ref_schedule.starts
-    ends = ref_schedule.ends
-
-    delayed_starts = delayed_schedule.starts
-    delayed_ends = delayed_schedule.ends
-
-    problem = CpRegulationProblem(len(trains), len(zones))
-
-    for train_idx, _ in enumerate(trains):
-        prev_step = -1
-        prev_zone = None
-        for zone in ref_schedule.trajectory(train_idx):
-            overlap = 0
-            if prev_zone is not None:
-                overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
-                              - delayed_starts.loc[zone][train_idx]))
-            problem.add_step(
-                train=train_idx,
-                zone=zones.index(zone),
-                prev_idx=prev_step,
-                min_arrival=int(starts.loc[zone][train_idx]),
-                min_departure=int(ends.loc[zone][train_idx]),
-                min_duration=int(delayed_ends.loc[zone][train_idx])
-                - int(delayed_starts.loc[zone][train_idx]),
-                is_fixed=True if osrd.stop_positions[train_idx][zone]['offset']
-                is None else False,
-                overlap=overlap
-            )
-            prev_zone = zone
-            prev_step = len(problem.steps) - 1
-
-    return problem
+    return steps_from_schedule(
+        ref_schedule,
+        delayed_schedule,
+        fixed_durations,
+        weights
+    )
 
 
-def osrd_stops_from_solution(
-        osrd: OSRD, solution: CpRegulationSolution) -> List[Dict[str, Any]]:
-    """Transform a constraint programming solution to a list of stops
-
-    Parameters
-    ----------
-    osrd : OSRD
-        osrd simulation
-    solution : CpRegulationSolution
-        solution returned by a constraint programming solver
-
-    Returns
-    -------
-    List[Dict[str, Any]]
-        list of stops
-    """
-    stops = []
-    if solution.status == OptimisationStatus.FAILED:
-        return stops
-    ref_schedule = schedule_from_osrd(osrd)
-    zones = ref_schedule.blocks
-    for delay in solution.get_delays():
-        pos = osrd.stop_positions[delay["train"]][zones[delay["zone"]]]
-        assert pos['offset'] is not None
-        stops.append({
-            "train": delay["train"],
-            "position": pos['offset'],
-            "duration": delay["duration"]
-        })
-    return stops
-
-
-def regulation_problem_from_schedule(
-        ref_schedule: Schedule,
-        delayed_schedule: Schedule,
-        fixed_durations: pd.DataFrame = None,
-        weights: pd.DataFrame = None) -> CpRegulationProblem:
-    """Convert a problem from a schedule format to a CpRegulationProblem
+def steps_from_schedule(
+    ref_schedule: Schedule,
+    delayed_schedule: Schedule,
+    fixed_durations: pd.DataFrame = None,
+    weights: pd.DataFrame = None
+) -> List[Dict]:
+    """Convert a problem from a schedule format to a steps
 
     Parameters
     ----------
@@ -123,10 +106,10 @@ def regulation_problem_from_schedule(
 
     Returns
     -------
-    CpRegulationProblem
-        problem in a CpRegulationProblem format
+    List[Dict]
+        A list of steps where information is stored in dictionnary
     """
-    zones = ref_schedule.blocks
+    zones = ref_schedule.zones
     trains = ref_schedule.trains
 
     starts = ref_schedule.starts
@@ -135,16 +118,16 @@ def regulation_problem_from_schedule(
     delayed_starts = delayed_schedule.starts
     delayed_ends = delayed_schedule.ends
 
-    problem = CpRegulationProblem(len(trains), len(zones))
+    steps = []
 
-    for train_idx, _ in enumerate(trains):
+    for train_idx, train in enumerate(trains):
         prev_step = -1
         prev_zone = None
         for zone in ref_schedule.trajectory(train_idx):
             overlap = 0
             if prev_zone is not None:
-                overlap = max(0, int(delayed_ends.loc[prev_zone][train_idx]
-                              - delayed_starts.loc[zone][train_idx]))
+                overlap = max(0, int(delayed_ends.loc[prev_zone][train]
+                              - delayed_starts.loc[zone][train]))
             is_fixed = (
                 True
                 if (fixed_durations is not None
@@ -154,30 +137,33 @@ def regulation_problem_from_schedule(
             ponderation = (
                 1
                 if weights is None
-                else weights.loc[zone][train_idx]
+                else weights.loc[zone][train]
             )
 
-            problem.add_step(
-                train=train_idx,
+            steps.append(build_step(
+                train=train,
                 zone=zones.index(zone),
                 prev_idx=prev_step,
-                min_arrival=int(starts.loc[zone][train_idx]),
-                min_departure=int(ends.loc[zone][train_idx]),
-                min_duration=int(delayed_ends.loc[zone][train_idx])
-                - int(delayed_starts.loc[zone][train_idx]),
+                min_arrival=int(starts.loc[zone][train]),
+                min_departure=int(ends.loc[zone][train]),
+                min_duration=int(delayed_ends.loc[zone][train])
+                - int(delayed_starts.loc[zone][train]),
                 is_fixed=is_fixed,
                 ponderation=ponderation,
                 overlap=overlap
-            )
+            ))
             prev_zone = zone
-            prev_step = len(problem.steps) - 1
+            prev_step = len(steps) - 1
 
-    return problem
+    return steps
 
 
 def schedule_from_solution(
         ref_schedule: Schedule,
-        solution: CpRegulationSolution) -> Schedule:
+        status: OptimisationStatus,
+        steps: List[Dict],
+        arrivals: List[int],
+        departures: List[int]) -> Schedule:
     """Generate a regulated Schedule from a CpRegulationSolution
 
     Parameters
@@ -193,16 +179,16 @@ def schedule_from_solution(
         regulated schedule
     """
     regulated_schedule = copy.deepcopy(ref_schedule)
-    zones = regulated_schedule.blocks
+    zones = regulated_schedule.zones
 
-    if solution.status == OptimisationStatus.FAILED:
+    if status == OptimisationStatus.FAILED:
         return None
 
-    for step_idx, step in enumerate(solution.problem.steps):
+    for step_idx, step in enumerate(steps):
         regulated_schedule.set(
             step['train'],
             zones[step['zone']],
-            (solution.arrivals[step_idx], solution.departures[step_idx]))
+            (arrivals[step_idx], departures[step_idx]))
 
     return regulated_schedule
 
@@ -224,7 +210,12 @@ def extra_delays_from_regulated(
     pd.DataFrame
         extra delays
     """
-    extra_delays = regulated_schedule.durations - delayed_schedule.durations
+    if regulated_schedule is None:
+        extra_delays = delayed_schedule.durations * -1
+    else:
+        extra_delays = (
+            regulated_schedule.durations
+            - delayed_schedule.durations
+        )
     extra_delays = extra_delays.fillna(0).astype(int)
     return extra_delays
-
