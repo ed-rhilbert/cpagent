@@ -7,7 +7,7 @@ import pandas as pd
 
 from pyosrd import OSRD
 from pyosrd.schedules import Schedule
-from cpagent.osrd_adapter import build_step
+from cpagent.schedule_adapters import build_step
 
 
 # --------------------------------------------------------------------------- #

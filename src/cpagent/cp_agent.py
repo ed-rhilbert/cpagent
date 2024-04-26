@@ -2,15 +2,11 @@
 Provides a rlway agent using a constraint programming solver
 """
 
-import pandas as pd
-
 from ortools.sat.python import cp_model
 from pyosrd.agents.scheduler_agent import SchedulerAgent
+from pyosrd.schedules import Schedule
 
-from cpagent.osrd_adapter import (
-    extra_delays_from_regulated,
-)
-from cpagent.osrd_adapter import (
+from cpagent.schedule_adapters import (
     OptimisationStatus
 )
 
@@ -56,18 +52,13 @@ class CpAgent(SchedulerAgent):
     }
 
     @property
-    def steps_extra_delays(self) -> pd.DataFrame:
-        self.solve()
-
-        return self.extra_delays
+    def regulated_schedule(self) -> Schedule:
+        return self.solve()
 
     def solve(self):
-        regulated_schedule = self._solve(
+        return self._solve(
             self.ref_schedule,
             self.delayed_schedule,
             self.step_has_fixed_duration,
             self.weights
         )
-
-        self.extra_delays = extra_delays_from_regulated(
-            self.delayed_schedule, regulated_schedule)

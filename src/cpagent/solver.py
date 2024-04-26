@@ -7,7 +7,7 @@ import pandas as pd
 from ortools.sat.python import cp_model
 from pyosrd.schedules import Schedule
 
-from cpagent.osrd_adapter import (
+from cpagent.schedule_adapters import (
     steps_from_schedule,
     schedule_from_solution,
     OptimisationStatus
@@ -38,7 +38,7 @@ def _solve(
         steps_from_schedule(ref_schedule, delayed_schedule,
                             fixed_durations, weights)
     )
-    return self._get_solution(solver, status, ref_schedule)
+    return self._get_solution(solver, status, ref_schedule, delayed_schedule)
 
 
 def _solve_from_steps(
@@ -68,6 +68,7 @@ def _get_solution(
     solver: cp_model.CpSolver,
     ortoos_status,
     ref_schedule: Schedule,
+    delayed_schedule: Schedule,
 ) -> Schedule:
     """Generates a CpRegulationSolution from a ortools solver
 
@@ -78,13 +79,14 @@ def _get_solution(
 
     Returns
     -------
-    CpRegulationSolution
-        result solution
+    Schedule
+        result regulated schedule or the delayed
+        schedule if optimization failed
     """
     status = self.status_map.get(
         ortoos_status, OptimisationStatus.FAILED)
     if status == OptimisationStatus.FAILED:
-        return None
+        return delayed_schedule
 
     return schedule_from_solution(
         ref_schedule,
