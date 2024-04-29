@@ -36,13 +36,13 @@ def test_solver_simple(solver, use_case_straight_line_2t):
         use_case_straight_line_2t[1],
         use_case_straight_line_2t[2]
     )
-    cp_solver.Values(solver.arrivals).to_list()
+    cp_solver.Values(solver.t_in).to_list()
     cost_oracle = 10
-    arrivals_oracle = [0, 10, 10, 30]
-    departures_oracle = [10, 30, 30, 40]
+    t_in_oracle = [0, 10, 10, 30]
+    t_out_oracle = [10, 30, 30, 40]
     assert int(cp_solver.ObjectiveValue()) == cost_oracle
-    assert cp_solver.Values(solver.arrivals).to_list() == arrivals_oracle
-    assert cp_solver.Values(solver.departures).to_list() == departures_oracle
+    assert cp_solver.Values(solver.t_in).to_list() == t_in_oracle
+    assert cp_solver.Values(solver.t_out).to_list() == t_out_oracle
 
 
 @pytest.mark.parametrize("solver", [

@@ -92,8 +92,8 @@ def _get_solution(
         ref_schedule,
         status,
         self.steps,
-        solver.Values(self.arrivals).to_list(),
-        solver.Values(self.departures).to_list())
+        solver.Values(self.t_in).to_list(),
+        solver.Values(self.t_out).to_list())
 
 
 class HistoryHandler(cp_model.CpSolverSolutionCallback):

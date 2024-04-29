@@ -13,7 +13,7 @@ def _create_objective(
         model to fill
     """
     model.Minimize(sum([
-        (self.arrivals[i] - step['min_arrival'])
+        (self.t_in[i] - step['min_t_in'])
         * step['ponderation']
         for i, step in enumerate(self.steps)
     ]))
