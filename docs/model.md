@@ -9,7 +9,7 @@ Zones are physically defined portions of the intrastructure, delimited by two de
 - a block beween two stations (in which the trains can accelerate/decelerate),
 - a switch, or a set of switches (in which the trains can not stop).
 
-A train trajectory is composed of a succession of **steps**, each step being defined by:
+A train path is composed of a succession of **steps**, each step being defined by:
   - a zone
   - a train
   - its arrival and departure times in the zone, in seconds

@@ -36,10 +36,10 @@ pip install --upgrade git+ssh://git@github.com/ed-rhilbert/cpagent.git
 
 ```python3
 >>> from pyosrd.osrd import OSRD
->>> from rlway_cpagent.ortools_agent.ortools_agent import OrtoolsAgent
+>>> from cpagent.cp_agent import CpAgent
 >>> sim = OSRD(use_case='station_capacity2', dir='tmp')
 >>> sim.add_delay('train0', time_threshold=150, delay=800.)
->>> regulated = sim.regulate(agent=OrtoolsAgent("ortools_agent"))
+>>> regulated = sim.regulate(agent=CpAgent("ortools_agent"))
 ```
 
 ## Custom Java binary path

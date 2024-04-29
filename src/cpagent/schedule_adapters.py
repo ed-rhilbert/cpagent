@@ -4,12 +4,9 @@ from an osrd format to a constraint programming format
 """
 from enum import Enum
 
-from typing import Dict, List
 import copy
 import pandas as pd
-
-from pyosrd.osrd import OSRD
-from pyosrd.schedules import Schedule, schedule_from_osrd
+from pyosrd.schedules import Schedule
 
 
 class OptimisationStatus(Enum):
@@ -23,7 +20,7 @@ class OptimisationStatus(Enum):
 
 def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
                min_departure: int, min_duration: int, is_fixed: bool,
-               ponderation: int = 1, overlap: int = 0) -> Dict:
+               ponderation: int = 1, overlap: int = 0) -> dict:
     """Add a step to the regulation problem
 
     Parameters
@@ -58,39 +55,12 @@ def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
     }
 
 
-def steps_from_osrd(
-    osrd: OSRD,
-    fixed_durations: pd.DataFrame = None,
-    weights: pd.DataFrame = None
-) -> List[Dict]:
-    ref_schedule = schedule_from_osrd(osrd)
-    delayed_schedule = schedule_from_osrd(osrd.delayed())
-
-    if fixed_durations is None:
-        fixed_durations = pd.DataFrame()
-        trains = ref_schedule.trains
-        for train_idx, _ in enumerate(trains):
-            for zone in ref_schedule.trajectory(train_idx):
-                fixed_durations.loc[zone, train_idx] = (
-                    True
-                    if osrd.stop_positions[train_idx][zone]['offset'] is None
-                    else False
-                )
-
-    return steps_from_schedule(
-        ref_schedule,
-        delayed_schedule,
-        fixed_durations,
-        weights
-    )
-
-
 def steps_from_schedule(
     ref_schedule: Schedule,
     delayed_schedule: Schedule,
     fixed_durations: pd.DataFrame = None,
     weights: pd.DataFrame = None
-) -> List[Dict]:
+) -> list[dict]:
     """Convert a problem from a schedule format to a steps
 
     Parameters
@@ -106,7 +76,7 @@ def steps_from_schedule(
 
     Returns
     -------
-    List[Dict]
+    list[dict]
         A list of steps where information is stored in dictionnary
     """
     zones = ref_schedule.zones
@@ -117,13 +87,14 @@ def steps_from_schedule(
 
     delayed_starts = delayed_schedule.starts
     delayed_ends = delayed_schedule.ends
+    min_times = delayed_schedule.min_durations
 
     steps = []
 
     for train_idx, train in enumerate(trains):
         prev_step = -1
         prev_zone = None
-        for zone in ref_schedule.trajectory(train_idx):
+        for zone in ref_schedule.path(train_idx):
             overlap = 0
             if prev_zone is not None:
                 overlap = max(0, int(delayed_ends.loc[prev_zone][train]
@@ -131,7 +102,7 @@ def steps_from_schedule(
             is_fixed = (
                 True
                 if (fixed_durations is not None
-                    and fixed_durations.loc[zone][train_idx])
+                    and fixed_durations.loc[zone, train_idx])
                 else False
             )
             ponderation = (
@@ -146,8 +117,7 @@ def steps_from_schedule(
                 prev_idx=prev_step,
                 min_arrival=int(starts.loc[zone][train]),
                 min_departure=int(ends.loc[zone][train]),
-                min_duration=int(delayed_ends.loc[zone][train])
-                - int(delayed_starts.loc[zone][train]),
+                min_duration=int(min_times.loc[zone][train]),
                 is_fixed=is_fixed,
                 ponderation=ponderation,
                 overlap=overlap
@@ -161,17 +131,23 @@ def steps_from_schedule(
 def schedule_from_solution(
         ref_schedule: Schedule,
         status: OptimisationStatus,
-        steps: List[Dict],
-        arrivals: List[int],
-        departures: List[int]) -> Schedule:
-    """Generate a regulated Schedule from a CpRegulationSolution
+        steps: list[dict],
+        arrivals: list[int],
+        departures: list[int]) -> Schedule:
+    """Generate a regulated Schedule from cp results
 
     Parameters
     ----------
     ref_schedule : Schedule
         ref schedule
-    solution : CpRegulationSolution
-        cp solution
+    status : OptimisationStatus
+        cp status of the optimize
+    steps : list[dict]
+        the list of steps
+    arrivals : list[int]
+        time of arrivals
+    departures : list[int]
+        time of departures
 
     Returns
     -------
@@ -191,31 +167,3 @@ def schedule_from_solution(
             (arrivals[step_idx], departures[step_idx]))
 
     return regulated_schedule
-
-
-def extra_delays_from_regulated(
-        delayed_schedule: Schedule,
-        regulated_schedule: Schedule) -> pd.DataFrame:
-    """Convert from delayed and regulated schedule to extra delays
-
-    Parameters
-    ----------
-    delayed_schedule : Schedule
-        delayed schedule
-    regulated_schedule : Schedule
-        regulated schedule
-
-    Returns
-    -------
-    pd.DataFrame
-        extra delays
-    """
-    if regulated_schedule is None:
-        extra_delays = delayed_schedule.durations * -1
-    else:
-        extra_delays = (
-            regulated_schedule.durations
-            - delayed_schedule.durations
-        )
-    extra_delays = extra_delays.fillna(0).astype(int)
-    return extra_delays

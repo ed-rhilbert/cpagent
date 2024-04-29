@@ -1,13 +1,42 @@
 from copy import deepcopy
 
-
-from cpagent.osrd_adapter import (
+import pandas as pd
+from cpagent.schedule_adapters import (
     build_step,
-    steps_from_osrd,
     steps_from_schedule,
     schedule_from_solution,
     OptimisationStatus,
 )
+
+from pyosrd.osrd import OSRD
+from pyosrd.schedules import schedule_from_osrd
+
+
+def steps_from_osrd(
+    osrd: OSRD,
+    fixed_durations: pd.DataFrame = None,
+    weights: pd.DataFrame = None
+) -> list[dict]:
+    ref_schedule = schedule_from_osrd(osrd)
+    delayed_schedule = schedule_from_osrd(osrd.delayed())
+
+    if fixed_durations is None:
+        fixed_durations = pd.DataFrame()
+        trains = ref_schedule.trains
+        for train_idx, _ in enumerate(trains):
+            for zone in ref_schedule.path(train_idx):
+                fixed_durations.loc[zone, train_idx] = (
+                    True
+                    if osrd.stop_positions[train_idx][zone]['offset'] is None
+                    else False
+                )
+
+    return steps_from_schedule(
+        ref_schedule,
+        delayed_schedule,
+        fixed_durations,
+        weights
+    )
 
 
 def test_regulation_problem_from_osrd(osrd_point_switch):
@@ -17,11 +46,11 @@ def test_regulation_problem_from_osrd(osrd_point_switch):
 
     oracle_steps = []
 
-    oracle_steps.append(build_step("train0", 0, -1, 0, 242, 642, False, 1, 0))
-    oracle_steps.append(build_step("train0", 1, 0, 236, 247, 11, True, 1, 5))
+    oracle_steps.append(build_step("train0", 0, -1, 0, 242, 242, False, 1, 0))
+    oracle_steps.append(build_step("train0", 1, 0, 236, 247, 10, True, 1, 5))
     oracle_steps.append(build_step("train0", 2, 1, 242, 449, 207, True, 1, 5))
     oracle_steps.append(build_step("train1", 3, -1, 100, 342, 242, False, 1, 0)) # noqa
-    oracle_steps.append(build_step("train1", 1, 3, 336, 347, 11, True, 1, 5))
+    oracle_steps.append(build_step("train1", 1, 3, 336, 347, 10, True, 1, 5))
     oracle_steps.append(build_step("train1", 0, 4, 342, 549, 207, True, 1, 5))
 
     assert oracle_steps == steps
