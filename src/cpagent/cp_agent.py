@@ -48,6 +48,8 @@ class CpAgent(SchedulerAgent):
     status_map = {
         cp_model.OPTIMAL: OptimisationStatus.OPTIMAL,
         cp_model.FEASIBLE: OptimisationStatus.SUBOPTIMAL,
+        cp_model.MODEL_INVALID: OptimisationStatus.FAILED,
+        cp_model.UNKNOWN: OptimisationStatus.FAILED,
         cp_model.INFEASIBLE: OptimisationStatus.FAILED
     }
 
