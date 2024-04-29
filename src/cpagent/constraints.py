@@ -49,7 +49,7 @@ def _add_chaining_constraints(
     for i, step in enumerate(self.steps):
         if step['prev'] != -1:
             model.Add(
-                self.arrivals[i] == self.departures[step['prev']]
+                self.t_in[i] == self.t_out[step['prev']]
                 - step['overlap']
             )
 
@@ -61,7 +61,7 @@ def _add_enforce_order_constraints(
     for i, step in enumerate(self.steps):
         for j, other in enumerate(self.steps):
             if (
-                step['min_arrival'] < other['min_arrival']
+                step['min_t_in'] < other['min_t_in']
                 and step['zone'] == other['zone']
             ):
-                model.Add(self.arrivals[i] < self.arrivals[j])
+                model.Add(self.t_in[i] < self.t_in[j])

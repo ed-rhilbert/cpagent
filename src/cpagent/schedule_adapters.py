@@ -18,8 +18,8 @@ class OptimisationStatus(Enum):
     FAILED = 3
 
 
-def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
-               min_departure: int, min_duration: int, is_fixed: bool,
+def build_step(train: str, zone: int, prev_idx: int, min_t_in: int,
+               min_t_out: int, min_duration: int, is_fixed: bool,
                ponderation: int = 1, overlap: int = 0) -> dict:
     """Add a step to the regulation problem
 
@@ -31,14 +31,14 @@ def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
         index of the associated zone
     prev_idx : int
         index of the previous step
-    min_arrival : int
+    min_t_in : int
         min arrival time of the step
-    min_departure : int
+    min_t_out : int
         min departure time of the step
     min_duration : int
         min duration of the step
     is_fixed : bool
-        true if the arrival time must match the min_arrival
+        true if the arrival time must match the min_t_in
     ponderation : float
         The step ponderation in the objective function
     """
@@ -46,8 +46,8 @@ def build_step(train: str, zone: int, prev_idx: int, min_arrival: int,
         "train": train,
         "zone": zone,
         "prev": prev_idx,
-        "min_arrival": min_arrival,
-        "min_departure": min_departure,
+        "min_t_in": min_t_in,
+        "min_t_out": min_t_out,
         "min_duration": min_duration,
         "is_fixed": is_fixed,
         "ponderation": ponderation,
@@ -115,8 +115,8 @@ def steps_from_schedule(
                 train=train,
                 zone=zones.index(zone),
                 prev_idx=prev_step,
-                min_arrival=int(starts.loc[zone][train]),
-                min_departure=int(ends.loc[zone][train]),
+                min_t_in=int(starts.loc[zone][train]),
+                min_t_out=int(ends.loc[zone][train]),
                 min_duration=int(min_times.loc[zone][train]),
                 is_fixed=is_fixed,
                 ponderation=ponderation,
@@ -132,8 +132,8 @@ def schedule_from_solution(
         ref_schedule: Schedule,
         status: OptimisationStatus,
         steps: list[dict],
-        arrivals: list[int],
-        departures: list[int]) -> Schedule:
+        t_in: list[int],
+        t_out: list[int]) -> Schedule:
     """Generate a regulated Schedule from cp results
 
     Parameters
@@ -144,10 +144,10 @@ def schedule_from_solution(
         cp status of the optimize
     steps : list[dict]
         the list of steps
-    arrivals : list[int]
-        time of arrivals
-    departures : list[int]
-        time of departures
+    t_in : list[int]
+        time of t_in
+    t_out : list[int]
+        time of t_out
 
     Returns
     -------
@@ -164,6 +164,6 @@ def schedule_from_solution(
         regulated_schedule.set(
             step['train'],
             zones[step['zone']],
-            (arrivals[step_idx], departures[step_idx]))
+            (t_in[step_idx], t_out[step_idx]))
 
     return regulated_schedule

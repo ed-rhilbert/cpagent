@@ -21,8 +21,8 @@ class CpRegulationSolution:
     nb_trains: int
     steps: List[Dict]
     cost: float
-    arrivals: List[int]
-    departures: List[int]
+    t_in: List[int]
+    t_out: List[int]
 
     def get_delays(self) -> List[Dict[str, Any]]:
         """Return the delays applied to each steps
@@ -35,12 +35,12 @@ class CpRegulationSolution:
         delays = []
         if (
             self.steps is None or
-            self.arrivals is None or
-            self.departures is None
+            self.t_in is None or
+            self.t_out is None
         ):
             return delays
         for idx, step in enumerate(self.steps):
-            duration = self.departures[idx] - self.arrivals[idx]
+            duration = self.t_out[idx] - self.t_in[idx]
             delay = duration - step["min_duration"]
             if delay > 0:
                 delays.append({
@@ -59,8 +59,8 @@ def build_solution(
         solver.nb_zones,
         solver.steps,
         int(cp_solver.ObjectiveValue()),
-        cp_solver.Values(solver.arrivals).to_list(),
-        cp_solver.Values(solver.departures).to_list()
+        cp_solver.Values(solver.t_in).to_list(),
+        cp_solver.Values(solver.t_out).to_list()
     )
 
 
@@ -178,8 +178,8 @@ def test_check_chaining_invalid(use_case_cp_4_zones_switch):
     assert not check_chaining(solution)
 
 
-def test_check_min_arrival_valid(use_case_cp_4_zones_switch):
-    """Test method check_min_arrival with valid solution
+def test_check_min_t_in_valid(use_case_cp_4_zones_switch):
+    """Test method check_min_t_in with valid solution
 
     Parameters
     ----------
@@ -194,11 +194,11 @@ def test_check_min_arrival_valid(use_case_cp_4_zones_switch):
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
-    assert check_min_arrival(solution)
+    assert check_min_t_in(solution)
 
 
-def test_check_min_arrival_invalid(use_case_cp_4_zones_switch):
-    """Test method check_min_arrival with invalid solution
+def test_check_min_t_in_invalid(use_case_cp_4_zones_switch):
+    """Test method check_min_t_in with invalid solution
 
     Parameters
     ----------
@@ -213,11 +213,11 @@ def test_check_min_arrival_invalid(use_case_cp_4_zones_switch):
         [0, 20, 30, 20, 25, 40],
         [20, 30, 40, 25, 40, 50])
 
-    assert not check_min_arrival(solution)
+    assert not check_min_t_in(solution)
 
 
-def test_check_min_departure_valid(use_case_cp_4_zones_switch):
-    """Test method check_min_departure with valid solution
+def test_check_min_t_out_valid(use_case_cp_4_zones_switch):
+    """Test method check_min_t_out with valid solution
 
     Parameters
     ----------
@@ -232,11 +232,11 @@ def test_check_min_departure_valid(use_case_cp_4_zones_switch):
         [0, 20, 30, 20, 30, 40],
         [20, 30, 40, 30, 40, 50])
 
-    assert check_min_departure(solution)
+    assert check_min_t_out(solution)
 
 
-def test_check_min_departure_invalid(use_case_cp_4_zones_switch):
-    """Test method check_min_departure with invalid solution
+def test_check_min_t_out_invalid(use_case_cp_4_zones_switch):
+    """Test method check_min_t_out with invalid solution
 
     Parameters
     ----------
@@ -251,7 +251,7 @@ def test_check_min_departure_invalid(use_case_cp_4_zones_switch):
         [0, 20, 30, 20, 25, 40],
         [20, 30, 40, 25, 40, 50])
 
-    assert not check_min_departure(solution)
+    assert not check_min_t_out(solution)
 
 
 def test_check_min_duration_valid(use_case_cp_4_zones_switch):
@@ -421,8 +421,8 @@ def check_solution_validity(cp_solution: CpRegulationSolution) -> bool:
     return (
         check_spacing(cp_solution)
         and check_chaining(cp_solution)
-        and check_min_arrival(cp_solution)
-        and check_min_departure(cp_solution)
+        and check_min_t_in(cp_solution)
+        and check_min_t_out(cp_solution)
         and check_min_duration(cp_solution)
         and check_fixed_duration(cp_solution)
         and check_first_step(cp_solution)
@@ -447,7 +447,7 @@ def check_spacing(cp_solution: CpRegulationSolution) -> bool:
     is_overlapping = []
     for zone_idx in range(cp_solution.nb_zones):
         intervals = [
-            (cp_solution.arrivals[idx], cp_solution.departures[idx])
+            (cp_solution.t_in[idx], cp_solution.t_out[idx])
             for idx, step in enumerate(cp_solution.steps)
             if step["zone"] == zone_idx
         ]
@@ -471,13 +471,13 @@ def check_chaining(cp_solution: CpRegulationSolution) -> bool:
         True if the solution respect the constraint
     """
     return not any([
-        cp_solution.departures[step["prev"]] != cp_solution.arrivals[step_idx]
+        cp_solution.t_out[step["prev"]] != cp_solution.t_in[step_idx]
         for step_idx, step in enumerate(cp_solution.steps)
         if step["prev"] != -1
     ])
 
 
-def check_min_arrival(cp_solution: CpRegulationSolution) -> bool:
+def check_min_t_in(cp_solution: CpRegulationSolution) -> bool:
     """Check if a step arrives after the reference
 
     Parameters
@@ -491,12 +491,12 @@ def check_min_arrival(cp_solution: CpRegulationSolution) -> bool:
         True if the solution respect the constraint
     """
     return not any(
-        cp_solution.arrivals[step_idx] < step["min_arrival"]
+        cp_solution.t_in[step_idx] < step["min_t_in"]
         for step_idx, step in enumerate(cp_solution.steps)
     )
 
 
-def check_min_departure(cp_solution: CpRegulationSolution) -> bool:
+def check_min_t_out(cp_solution: CpRegulationSolution) -> bool:
     """Check if a step leaves after the reference
 
     Parameters
@@ -510,7 +510,7 @@ def check_min_departure(cp_solution: CpRegulationSolution) -> bool:
         True if the solution respect the constraint
     """
     return not any(
-        cp_solution.departures[step_idx] < step["min_departure"]
+        cp_solution.t_out[step_idx] < step["min_t_out"]
         for step_idx, step in enumerate(cp_solution.steps)
     )
 
@@ -529,7 +529,7 @@ def check_min_duration(cp_solution: CpRegulationSolution) -> bool:
         True if the solution respects the constraint
     """
     return not any(
-        cp_solution.departures[step_idx] - cp_solution.arrivals[step_idx]
+        cp_solution.t_out[step_idx] - cp_solution.t_in[step_idx]
         < step["min_duration"]
         for step_idx, step in enumerate(cp_solution.steps)
     )
@@ -549,7 +549,7 @@ def check_fixed_duration(cp_solution: CpRegulationSolution) -> bool:
         True if the constraint is respected
     """
     return not any(
-        cp_solution.departures[step_idx] - cp_solution.arrivals[step_idx]
+        cp_solution.t_out[step_idx] - cp_solution.t_in[step_idx]
         != step["min_duration"]
         for step_idx, step in enumerate(cp_solution.steps)
         if step["is_fixed"] is True
@@ -570,7 +570,7 @@ def check_first_step(cp_solution: CpRegulationSolution) -> bool:
         True if the constraint is respected
     """
     return not any(
-        cp_solution.arrivals[step_idx] != step["min_arrival"]
+        cp_solution.t_in[step_idx] != step["min_t_in"]
         for step_idx, step in enumerate(cp_solution.steps)
         if step["prev"] == -1
     )
@@ -592,7 +592,7 @@ def check_objective_value(cp_solution: CpRegulationSolution) -> bool:
     """
     return cp_solution.cost == sum(
         [
-            (cp_solution.arrivals[i] - step["min_arrival"])
+            (cp_solution.t_in[i] - step["min_t_in"])
             * step["ponderation"]
             for i, step in enumerate(cp_solution.steps)
         ]

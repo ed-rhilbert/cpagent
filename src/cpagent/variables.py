@@ -11,18 +11,18 @@ def _create_variables(
     model : cp_model.CpModel
         The model to fill
     """
-    self.arrivals = [
+    self.t_in = [
         model.NewIntVar(
-            step['min_arrival'],
-            step['min_arrival'] if step['prev'] == -1
+            step['min_t_in'],
+            step['min_t_in'] if step['prev'] == -1
             else cp_model.INT32_MAX,
-            f"arrivals[{i}]")
+            f"t_in[{i}]")
         for i, step in enumerate(self.steps)]
-    self.departures = [
+    self.t_out = [
         model.NewIntVar(
-            step['min_departure'],
+            step['min_t_out'],
             cp_model.INT32_MAX,
-            f"departures[{i}]")
+            f"t_out[{i}]")
         for i, step in enumerate(self.steps)]
     self.durations = [
         model.NewIntVar(
@@ -33,8 +33,8 @@ def _create_variables(
         for i, step in enumerate(self.steps)]
     self.intervals = [
         model.NewIntervalVar(
-            self.arrivals[i],
+            self.t_in[i],
             self.durations[i],
-            self.departures[i],
-            f"departures[{i}]")
+            self.t_out[i],
+            f"t_out[{i}]")
         for i, step in enumerate(self.steps)]

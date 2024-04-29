@@ -33,8 +33,8 @@ class CpAgent(SchedulerAgent):
         _solve
     )
 
-    arrivals = None
-    departures = None
+    t_in = None
+    t_out = None
     durations = None
     intervals = None
     history = None
