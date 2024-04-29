@@ -82,9 +82,6 @@ def steps_from_schedule(
     zones = ref_schedule.zones
     trains = ref_schedule.trains
 
-    starts = ref_schedule.starts
-    ends = ref_schedule.ends
-
     delayed_starts = delayed_schedule.starts
     delayed_ends = delayed_schedule.ends
     min_times = delayed_schedule.min_durations
@@ -115,8 +112,8 @@ def steps_from_schedule(
                 train=train,
                 zone=zones.index(zone),
                 prev_idx=prev_step,
-                min_t_in=int(starts.loc[zone][train]),
-                min_t_out=int(ends.loc[zone][train]),
+                min_t_in=int(delayed_starts.loc[zone][train]),
+                min_t_out=int(delayed_ends.loc[zone][train]),
                 min_duration=int(min_times.loc[zone][train]),
                 is_fixed=is_fixed,
                 ponderation=ponderation,
@@ -161,6 +158,7 @@ def schedule_from_solution(
         return None
 
     for step_idx, step in enumerate(steps):
+        print(step['train'], " ", zones[step['zone']], t_in[step_idx])
         regulated_schedule.set(
             step['train'],
             zones[step['zone']],

@@ -14,8 +14,7 @@ def _create_variables(
     self.t_in = [
         model.NewIntVar(
             step['min_t_in'],
-            step['min_t_in'] if step['prev'] == -1
-            else cp_model.INT32_MAX,
+            cp_model.INT32_MAX,
             f"t_in[{i}]")
         for i, step in enumerate(self.steps)]
     self.t_out = [
