@@ -6,7 +6,7 @@ import re
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
-VERSIONFILE = "src/rlway_cpagent/__version__.py"
+VERSIONFILE = "src/cpagent/__version__.py"
 verstrline = open(VERSIONFILE, "rt").read()
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 mo = re.search(VSRE, verstrline, re.M)
