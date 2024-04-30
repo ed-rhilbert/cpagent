@@ -43,6 +43,7 @@ class CpAgent(SchedulerAgent):
     extra_delays = None
     max_optimization_time = SOLVER_TIMEOUT
     save_history = False
+    itinierary_setup = 120
 
     # solution
 

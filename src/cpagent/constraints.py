@@ -94,7 +94,10 @@ def _add_precedence_constraints(
                 all_others_before.append(self.precs[i][j])
                 all_others_after.append(self.precs[j][i])
                 model.AddAtMostOne([self.precs[i][j], self.precs[j][i]])
-                model.Add(self.t_out[i] <= self.t_in[j]) \
+                model.Add(
+                    self.t_out[i]
+                    + self.itinierary_setup * self.diff_itineraries[i][j]
+                    <= self.t_in[j]) \
                     .OnlyEnforceIf(self.precs[i][j])
 
         model.AddExactlyOne(all_others_before)

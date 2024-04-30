@@ -74,3 +74,22 @@ def _create_variables(
         ]
         for j, step_j in enumerate(self.steps)
     ]
+
+    self.diff_itineraries = [
+        [
+            model.NewIntVar(
+                1 if (
+                    step_i["next"] >= 0
+                    and step_j["next"] >= 0
+                    and (
+                        self.steps[step_i["next"]]["zone"]
+                        != self.steps[step_j["next"]]["zone"]
+                    )
+                )
+                else 0,
+                1,
+                f"diff_itinierary_s{i}_s{j}")
+            for i, step_i in enumerate(self.steps)
+        ]
+        for j, step_j in enumerate(self.steps)
+    ]
