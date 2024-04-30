@@ -158,7 +158,6 @@ def schedule_from_solution(
         return None
 
     for step_idx, step in enumerate(steps):
-        print(step['train'], " ", zones[step['zone']], t_in[step_idx])
         regulated_schedule.set(
             step['train'],
             zones[step['zone']],
