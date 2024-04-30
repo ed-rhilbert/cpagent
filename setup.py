@@ -16,7 +16,7 @@ else:
     raise RuntimeError("Unable to find version string in %s." % (VERSIONFILE,))
 
 setuptools.setup(
-    name="rlway-cpagent",
+    name="cpagent",
     version=version_str,
     author="Charles Pombet",
     author_email="charles.pombet@eurodecision.com",
