@@ -37,3 +37,40 @@ def _create_variables(
             self.t_out[i],
             f"t_out[{i}]")
         for i, step in enumerate(self.steps)]
+
+    # Precedence variables
+
+    # first_si : 1 if the step si is the first step to pass in its zone
+    # last_si : 1 if the step si is the last step to pass in its zone
+    # prec_si_sj : 1 if the step si is just before the step sj
+    #               for this to be true the two steps needs to be the same zone
+    #               and different trains
+    # diff_itinerary_si_sj : 1 if the step si and sj have a different zone
+    #                        AFTER the one they share
+
+    self.firsts = [
+        model.NewIntVar(
+            0,
+            1,
+            f"first_s{i}")
+        for i, _ in enumerate(self.steps)]
+    self.lasts = [
+        model.NewIntVar(
+            0,
+            1,
+            f"last_s{i}")
+        for i, _ in enumerate(self.steps)]
+    self.precs = [
+        [
+            model.NewIntVar(
+                0,
+                1 if (
+                    step_i["train"] != step_j["train"]
+                    and step_i["zone"] == step_j["zone"]
+                )
+                else 0,
+                f"prec_s{i}_s{j}")
+            for i, step_i in enumerate(self.steps)
+        ]
+        for j, step_j in enumerate(self.steps)
+    ]

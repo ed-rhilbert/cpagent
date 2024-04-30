@@ -15,6 +15,7 @@ def _create_constraints(
     self._add_chaining_constraints(model)
     if not self.allow_change_order:
         self._add_enforce_order_constraints(model)
+    self._add_precedence_constraints(model)
 
 
 def _add_spacing_constraints(
@@ -65,3 +66,36 @@ def _add_enforce_order_constraints(
                 and step['zone'] == other['zone']
             ):
                 model.Add(self.t_in[i] < self.t_in[j])
+
+
+def _add_precedence_constraints(
+        self,
+        model: cp_model.CpModel
+) -> None:
+    # build a map of step per zone
+    step_per_zone = {}
+    for step in self.steps:
+        if not step['zone'] in step_per_zone:
+            step_per_zone[step['zone']] = []
+        step_per_zone[step['zone']].append(step)
+
+    for steps_of_zone in step_per_zone.values():
+        model.AddExactlyOne(self.firsts[step['idx']] for step in steps_of_zone)
+        model.AddExactlyOne(self.lasts[step['idx']] for step in steps_of_zone)
+
+    for i, step in enumerate(self.steps):
+        all_others_before = [self.lasts[i]]
+        all_others_after = [self.firsts[i]]
+        for j, other in enumerate(self.steps):
+            if (
+                step['train'] != other['train']
+                and step['zone'] == other['zone']
+            ):
+                all_others_before.append(self.precs[i][j])
+                all_others_after.append(self.precs[j][i])
+                model.AddAtMostOne([self.precs[i][j], self.precs[j][i]])
+                model.Add(self.t_out[i] <= self.t_in[j]) \
+                    .OnlyEnforceIf(self.precs[i][j])
+
+        model.AddExactlyOne(all_others_before)
+        model.AddExactlyOne(all_others_after)
