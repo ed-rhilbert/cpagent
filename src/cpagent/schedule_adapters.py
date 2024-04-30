@@ -88,10 +88,10 @@ def steps_from_schedule(
 
     steps = []
 
-    for train_idx, train in enumerate(trains):
+    for _, train in enumerate(trains):
         prev_step = -1
         prev_zone = None
-        for zone in ref_schedule.path(train_idx):
+        for zone in ref_schedule.path(train):
             overlap = 0
             if prev_zone is not None:
                 overlap = max(0, int(delayed_ends.loc[prev_zone][train]
@@ -99,7 +99,7 @@ def steps_from_schedule(
             is_fixed = (
                 True
                 if (fixed_durations is not None
-                    and fixed_durations.loc[zone, train_idx])
+                    and fixed_durations.loc[zone, train])
                 else False
             )
             ponderation = (
