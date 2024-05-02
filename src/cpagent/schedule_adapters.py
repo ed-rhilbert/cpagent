@@ -20,7 +20,7 @@ class OptimisationStatus(Enum):
 
 def build_step(idx: int, train: str, zone: int, prev_idx: int, min_t_in: int,
                min_t_out: int, min_duration: int, is_fixed: bool,
-               ponderation: int = 1, overlap: int = 0) -> dict:
+               ponderation: int = 1, overlap: int = 0, next: int = -1) -> dict:
     """Add a step to the regulation problem
 
     Parameters
@@ -43,13 +43,17 @@ def build_step(idx: int, train: str, zone: int, prev_idx: int, min_t_in: int,
         true if the arrival time must match the min_t_in
     ponderation : float
         The step ponderation in the objective function
+    overlap : int
+        The overlap duration for this step
+    next : int
+        index of the next step
     """
     return {
         "idx": idx,
         "train": train,
         "zone": zone,
         "prev": prev_idx,
-        "next": -1,
+        "next": next,
         "min_t_in": min_t_in,
         "min_t_out": min_t_out,
         "min_duration": min_duration,
