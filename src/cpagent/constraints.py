@@ -72,6 +72,17 @@ def _add_precedence_constraints(
         self,
         model: cp_model.CpModel
 ) -> None:
+    """Ensure that the precedence between trains is well respected.
+
+    Multiple constraints are created to ensure we can know which steps
+    follow directly which other steps.
+
+    This corresponds ton constraints from 8 to 13 in the model
+    Parameters
+    ----------
+    model : cp_model.CpModel
+        model to fill
+    """
     # build a map of step per zone
     step_per_zone = {}
     for step in self.steps:
@@ -79,6 +90,7 @@ def _add_precedence_constraints(
             step_per_zone[step['zone']] = []
         step_per_zone[step['zone']].append(step)
 
+    # Constraints 8 and 9 from the model
     for steps_of_zone in step_per_zone.values():
         model.AddExactlyOne(self.firsts[step['idx']] for step in steps_of_zone)
         model.AddExactlyOne(self.lasts[step['idx']] for step in steps_of_zone)
@@ -93,12 +105,16 @@ def _add_precedence_constraints(
             ):
                 all_others_before.append(self.precs[i][j])
                 all_others_after.append(self.precs[j][i])
+                # Constraint 10
                 model.AddAtMostOne([self.precs[i][j], self.precs[j][i]])
+                # Constraint 11
                 model.Add(
                     self.t_out[i]
                     + self.itinierary_setup * self.diff_itineraries[i][j]
                     <= self.t_in[j]) \
                     .OnlyEnforceIf(self.precs[i][j])
 
+        # Constraint 12
         model.AddExactlyOne(all_others_before)
+        # Constraint 13
         model.AddExactlyOne(all_others_after)
