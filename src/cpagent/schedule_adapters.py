@@ -144,7 +144,8 @@ def schedule_from_solution(
         status: OptimisationStatus,
         steps: list[dict],
         t_in: list[int],
-        t_out: list[int]) -> Schedule:
+        t_out: list[int],
+        actives: list[int]) -> Schedule:
     """Generate a regulated Schedule from cp results
 
     Parameters
@@ -172,9 +173,15 @@ def schedule_from_solution(
         return None
 
     for step_idx, step in enumerate(steps):
-        regulated_schedule.set(
-            step['train'],
-            zones[step['zone']],
-            (t_in[step_idx], t_out[step_idx]))
+        if actives[step_idx] > 0:
+            regulated_schedule.set(
+                step['train'],
+                zones[step['zone']],
+                (t_in[step_idx], t_out[step_idx]))
+        else:
+            regulated_schedule.set(
+                step['train'],
+                zones[step['zone']],
+                (0, 1))
 
     return regulated_schedule

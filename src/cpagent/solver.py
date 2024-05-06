@@ -93,7 +93,8 @@ def _get_solution(
         status,
         self.steps,
         solver.Values(self.t_in).to_list(),
-        solver.Values(self.t_out).to_list())
+        solver.Values(self.t_out).to_list(),
+        solver.Values(self.actives).to_list())
 
 
 class HistoryHandler(cp_model.CpSolverSolutionCallback):

@@ -17,6 +17,7 @@ def _create_constraints(
     if not self.allow_change_order:
         self._add_enforce_order_constraints(model)
     self._add_precedence_constraints(model)
+    self._add_itineraries_constraints(model)
 
 
 def _add_spacing_constraints(
@@ -130,7 +131,7 @@ def _add_precedence_constraints(
         # model.AddExactlyOne(all_others_after)
 
 
-def _add_itinieraries_constraints(
+def _add_itineraries_constraints(
         self,
         model: cp_model.CpModel
 ) -> None:
@@ -149,6 +150,6 @@ def _add_itinieraries_constraints(
 
     # Constraint B
     for o, option in enumerate(self.options):
-        for i, it in enumerate(option.itineraries):
+        for i, it in enumerate(option.trajectories):
             for s in it.steps:
                 model.Add(self.itineraries[o][i] == self.actives[s])

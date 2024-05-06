@@ -101,14 +101,16 @@ def _create_variables(
     self.itineraries = [
         [
             model.NewIntVar(0, 1, f"itinerary_{i}_{o}")
-            for i, _ in enumerate(option.itineraries)
+            for i, _ in enumerate(option.trajectories)
         ]
         for o, option in enumerate(self.options)
     ]
 
+    print("itineraries : ", self.itineraries)
+
     step_in_itineraries = {}
     for option in self.options:
-        for it in option.itineraries:
+        for it in option.trajectories:
             for s in it.steps:
                 step_in_itineraries[s] = True
 
