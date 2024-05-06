@@ -45,6 +45,8 @@ class CpAgent(SchedulerAgent):
     save_history = False
     itinierary_setup = 120
 
+    options = []
+
     # solution
 
     status_map = {

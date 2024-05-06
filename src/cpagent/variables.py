@@ -93,3 +93,33 @@ def _create_variables(
         ]
         for j, step_j in enumerate(self.steps)
     ]
+
+    # itineraries variables
+
+    # itinerary_i_o : the itinerary i of the option o,
+    # 1 if it is taken, 0 otherwise
+    self.itineraries = [
+        [
+            model.NewIntVar(0, 1, f"itinerary_{i}_{o}")
+            for i, _ in enumerate(option.itineraries)
+        ]
+        for o, option in enumerate(self.options)
+    ]
+
+    step_in_itineraries = {}
+    for option in self.options:
+        for it in option.itineraries:
+            for s in it.steps:
+                step_in_itineraries[s] = True
+
+    # active_si : the step si is active
+    # 1 if it is taken, 0 otherwise
+    # all steps not in itineraries are set to 1
+    self.actives = [
+        model.NewIntVar(
+            0 if i in step_in_itineraries else 1,
+            1,
+            f"active__s{i}"
+        )
+        for i, _ in enumerate(self.steps)
+    ]
