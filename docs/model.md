@@ -168,8 +168,11 @@ New data would be required to allow change of itinerary :
 
 **Itinerary**
 - $S^i \subset \mathbb{N}$ : All steps in the itinerary $i$
-- $i^i \in \{0,1\}$ : boolean that tells us if the itinerary is taken or not
 - $I^o \subset \mathbb{N}$ : all the itineraries in the option $o$
+
+## Variables
+
+- $i^i \in \{0,1\}$ : boolean that tells us if the itinerary is taken or not
 - $active_s \in \{0,1\}$ : boolean that tells us if the step is activated (part of a selected itinerary).
 
 ## Constraits
@@ -196,12 +199,30 @@ $$
 $$\forall s_1, s_2 \in \{1,..,N_{steps}\} \; s.t. \; arrival_{s_1} < arrival_{s_1}\; s.t. \; active_{s_1} = active_{s_1} = 1, \\
 arrival_{s_1} \geq departure_{s_2} \lor departure_{s_1} \leq arrival_{s_2}$$
 
+5. The arrival time at a step is equal to the departure time of the prev step minus the overlap computed from the valid timetable.
+
+$$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s \neq 0, \\active_{prev_s} \implies arrival_s = departure_{prev_s} - overlap_ s$$
+
 7. _OPTIONAL_ A train cannot overtake another train (we use the reference ($min\_arrival$) to determine the order of trains)
 
 $$\forall s1, s2 \in \{1,...,N_{steps}\}\;\\
 s.t.\;  min\_arrival_{s1} < min\_arrival_{s2}\; \\
 s.t. \; active_{s_1} = active_{s_1} = 1,\\
 arrival_{s1} < arrival_{s2}$$
+
+**Precedence constraint**
+
+No precedence variable can be used if the step is not active.
+
+12. For every step there must be exactly one following step except if it's the last step on its zone
+$$
+\forall i \in {1,..., N_{steps}}\;\sum_{j\in \{j, zone_j = zone_i\}} prec_i^j + last_i = active_i
+$$
+
+13. For every step there must be exactly one previous step except if it's the first step on its zone
+$$
+\forall i \in {1,..., N_{steps}}\;\sum_{j\in \{j, zone_j = zone_i\}} prec_j^i + first_i = active_i
+$$
 
 ## Objective
 
