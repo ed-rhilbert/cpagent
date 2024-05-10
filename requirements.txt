@@ -7,12 +7,11 @@ build
 
 # doc
 sphinx
-m2r2==0.3.3.post2
 pydata-sphinx-theme
 sphinx-copybutton
 # nbsphinx
 # sphinx-automodapi
-docutils==0.19
+docutils
 
 # Linters
 pylint
