@@ -175,7 +175,7 @@ New data would be required to allow change of itinerary :
 - $i^i \in \{0,1\}$ : boolean that tells us if the itinerary is taken or not
 - $active_s \in \{0,1\}$ : boolean that tells us if the step is activated (part of a selected itinerary).
 
-## Constraits
+## Constraints
 
 A lot of constraints are modified from the original ones. New constraints are indexed by letters while modified one use the same numbering than previously.
 
