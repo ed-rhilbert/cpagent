@@ -143,7 +143,6 @@ def _add_precedence_constraints(
         # Constraint 13
         model.Add(
             cp_model.LinearExpr.Sum(all_others_after) == self.actives[i])
-        # model.AddExactlyOne(all_others_after)
 
 
 def _add_itineraries_constraints(
