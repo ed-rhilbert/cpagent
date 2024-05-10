@@ -88,7 +88,7 @@ def steps_from_schedule(
 
     steps = []
 
-    for _, train in enumerate(trains):
+    for train_idx, train in enumerate(trains):
         prev_step = -1
         prev_zone = None
         for zone in ref_schedule.path(train):
@@ -99,7 +99,7 @@ def steps_from_schedule(
             is_fixed = (
                 True
                 if (fixed_durations is not None
-                    and fixed_durations.loc[zone, train])
+                    and fixed_durations.loc[zone, train_idx])
                 else False
             )
             ponderation = (
