@@ -147,7 +147,7 @@ def schedule_from_solution(
         steps: list[dict],
         t_in: list[int],
         t_out: list[int],
-        actives: list[int]) -> Schedule:
+        actives: list[int] = None) -> Schedule:
     """Generate a regulated Schedule from cp results
 
     Parameters
@@ -175,7 +175,7 @@ def schedule_from_solution(
         return None
 
     for step_idx, step in enumerate(steps):
-        if actives[step_idx] > 0:
+        if actives is None or actives[step_idx] > 0:
             regulated_schedule.set(
                 step['train'],
                 zones[step['zone']],
