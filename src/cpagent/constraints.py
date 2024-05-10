@@ -98,6 +98,20 @@ def _add_precedence_constraints(
             step_per_zone[step['zone']] = []
         step_per_zone[step['zone']].append(step)
 
+    # Constraints 8a
+    for i, step_i in enumerate(self.steps):
+        for j, step_j in enumerate(self.steps):
+            if (
+                step_i["zone"] == step_j["zone"]
+                and step_i["train"] != step_j["train"]
+            ):
+                for ni in step_i["nexts"]:
+                    for nj in step_j["nexts"]:
+                        if self.steps[ni]["zone"] != self.steps[nj]["zone"]:
+                            model.Add(self.diff_itineraries[i][j] == 1)\
+                                .OnlyEnforceIf(self.actives[ni])\
+                                .OnlyEnforceIf(self.actives[nj])
+
     # Constraints 8 and 9 from the model
     for steps_of_zone in step_per_zone.values():
         model.AddExactlyOne(self.firsts[step['idx']] for step in steps_of_zone)

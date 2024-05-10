@@ -59,7 +59,8 @@ def build_step(idx: int, train: str, zone: int, prev_idx: int, min_t_in: int,
         "min_duration": min_duration,
         "is_fixed": is_fixed,
         "ponderation": ponderation,
-        "overlap": overlap
+        "overlap": overlap,
+        "nexts": [] if next < 0 else [next]
     }
 
 
@@ -119,6 +120,7 @@ def steps_from_schedule(
 
             if prev_step >= 0:
                 steps[prev_step]["next"] = global_idx
+                steps[prev_step]["nexts"].append(global_idx)
 
             steps.append(build_step(
                 idx=global_idx,
