@@ -54,11 +54,12 @@ def _add_chaining_constraints(
 
     # Constraint 5
     for i, step in enumerate(self.steps):
-        if step['prev'] != -1:
+        for next_i in step["nexts"]:
             model.Add(
-                self.t_in[i] == self.t_out[step['prev']]
-                - step['overlap']
-            ).OnlyEnforceIf(self.actives[step['prev']])
+                self.t_in[next_i] == self.t_out[i]
+                - self.steps[next_i]['overlap']
+            ).OnlyEnforceIf(self.actives[i])\
+                .OnlyEnforceIf(self.actives[next_i])
 
 
 def _add_enforce_order_constraints(
