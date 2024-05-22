@@ -46,12 +46,12 @@ def test_regulation_problem_from_osrd(osrd_point_switch):
 
     oracle_steps = []
 
-    oracle_steps.append(build_step("train0", 0, -1, 400, 642, 242, False, 1, 0)) # noqa
-    oracle_steps.append(build_step("train0", 1, 0, 636, 647, 10, True, 1, 5))
-    oracle_steps.append(build_step("train0", 2, 1, 642, 849, 207, True, 1, 5))
-    oracle_steps.append(build_step("train1", 3, -1, 100, 342, 242, False, 1, 0)) # noqa
-    oracle_steps.append(build_step("train1", 1, 3, 336, 347, 10, True, 1, 5))
-    oracle_steps.append(build_step("train1", 0, 4, 342, 549, 207, True, 1, 5))
+    oracle_steps.append(build_step(0, "train0", 0, -1, 400, 642, 242, False, 1, 0, 1)) # noqa
+    oracle_steps.append(build_step(1, "train0", 1, 0, 636, 647, 10, True, 1, 5, 2)) # noqa
+    oracle_steps.append(build_step(2, "train0", 2, 1, 642, 849, 207, True, 1, 5)) # noqa
+    oracle_steps.append(build_step(3, "train1", 3, -1, 100, 342, 242, False, 1, 0, 4)) # noqa
+    oracle_steps.append(build_step(4, "train1", 1, 3, 336, 347, 10, True, 1, 5, 5)) # noqa
+    oracle_steps.append(build_step(5, "train1", 0, 4, 342, 549, 207, True, 1, 5)) # noqa
 
     assert oracle_steps == steps
 

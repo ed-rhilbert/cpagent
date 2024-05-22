@@ -18,13 +18,15 @@ class OptimisationStatus(Enum):
     FAILED = 3
 
 
-def build_step(train: str, zone: int, prev_idx: int, min_t_in: int,
+def build_step(idx: int, train: str, zone: int, prev_idx: int, min_t_in: int,
                min_t_out: int, min_duration: int, is_fixed: bool,
-               ponderation: int = 1, overlap: int = 0) -> dict:
+               ponderation: int = 1, overlap: int = 0, next: int = -1) -> dict:
     """Add a step to the regulation problem
 
     Parameters
     ----------
+    idx : int
+        the index of this step
     train : str
         label of the associated train
     zone : int
@@ -41,11 +43,17 @@ def build_step(train: str, zone: int, prev_idx: int, min_t_in: int,
         true if the arrival time must match the min_t_in
     ponderation : float
         The step ponderation in the objective function
+    overlap : int
+        The overlap duration for this step
+    next : int
+        index of the next step
     """
     return {
+        "idx": idx,
         "train": train,
         "zone": zone,
         "prev": prev_idx,
+        "next": next,
         "min_t_in": min_t_in,
         "min_t_out": min_t_out,
         "min_duration": min_duration,
@@ -88,6 +96,7 @@ def steps_from_schedule(
 
     steps = []
 
+    global_idx = 0
     for train_idx, train in enumerate(trains):
         prev_step = -1
         prev_zone = None
@@ -108,7 +117,11 @@ def steps_from_schedule(
                 else weights.loc[zone][train]
             )
 
+            if prev_step >= 0:
+                steps[prev_step]["next"] = global_idx
+
             steps.append(build_step(
+                idx=global_idx,
                 train=train,
                 zone=zones.index(zone),
                 prev_idx=prev_step,
@@ -121,6 +134,7 @@ def steps_from_schedule(
             ))
             prev_zone = zone
             prev_step = len(steps) - 1
+            global_idx = global_idx + 1
 
     return steps
 

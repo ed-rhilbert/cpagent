@@ -23,6 +23,7 @@ class CpAgent(SchedulerAgent):
         _add_spacing_constraints,
         _add_chaining_constraints,
         _add_enforce_order_constraints,
+        _add_precedence_constraints,
         _create_constraints  # must be last because it calls above methods
     )
     from .variables import _create_variables
@@ -42,6 +43,7 @@ class CpAgent(SchedulerAgent):
     extra_delays = None
     max_optimization_time = SOLVER_TIMEOUT
     save_history = False
+    itinierary_setup = 120
 
     # solution
 

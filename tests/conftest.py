@@ -86,13 +86,13 @@ def use_case_cp_4_zones_switch():
     """
     steps = []
 
-    steps.append(build_step(0, 0, -1, 0, 10, 20, False, 2))
-    steps.append(build_step(0, 2, 0, 10, 20, 10, True, 2))
-    steps.append(build_step(0, 3, 1, 20, 30, 10, False, 2))
+    steps.append(build_step(0, 0, 0, -1, 0, 10, 20, False, 2))
+    steps.append(build_step(1, 0, 2, 0, 10, 20, 10, True, 2))
+    steps.append(build_step(2, 0, 3, 1, 20, 30, 10, False, 2))
 
-    steps.append(build_step(1, 1, -1, 20, 30, 10, False, 2))
-    steps.append(build_step(1, 2, 3, 30, 40, 10, True, 2))
-    steps.append(build_step(1, 3, 4, 40, 50, 10, False, 2))
+    steps.append(build_step(3, 1, 1, -1, 20, 30, 10, False, 2))
+    steps.append(build_step(4, 1, 2, 3, 30, 40, 10, True, 2))
+    steps.append(build_step(5, 1, 3, 4, 40, 50, 10, False, 2))
 
     yield 4, 2, steps
 
@@ -112,18 +112,18 @@ def use_case_delay_conv():
 
     steps = []
 
-    steps.append(build_step(0, 0, -1, 0, 10,
+    steps.append(build_step(0, 0, 0, -1, 0, 10,
                             10 + delay_at_first_departure, False, 1))
-    steps.append(build_step(0, 2, 0, 10, 20, 10, True, 1))
-    steps.append(build_step(0, 3, 1, 20, 30, 10, False, 1))
-    steps.append(build_step(0, 4, 2, 30, 40, 10, True, 1))
-    steps.append(build_step(0, 5, 3, 40, 50, 10, False, 1))
+    steps.append(build_step(1, 0, 2, 0, 10, 20, 10, True, 1))
+    steps.append(build_step(2, 0, 3, 1, 20, 30, 10, False, 1))
+    steps.append(build_step(3, 0, 4, 2, 30, 40, 10, True, 1))
+    steps.append(build_step(4, 0, 5, 3, 40, 50, 10, False, 1))
 
-    steps.append(build_step(1, 1, -1, 20, 30, 10, False, 1))
-    steps.append(build_step(1, 2, 5, 30, 40, 10, True, 1))
-    steps.append(build_step(1, 3, 6, 40, 50, 10, False, 1))
-    steps.append(build_step(1, 4, 6, 50, 60, 10, True, 1))
-    steps.append(build_step(1, 6, 8, 60, 70, 10, False, 1))
+    steps.append(build_step(5, 1, 1, -1, 20, 30, 10, False, 1))
+    steps.append(build_step(6, 1, 2, 5, 30, 40, 10, True, 1))
+    steps.append(build_step(7, 1, 3, 6, 40, 50, 10, False, 1))
+    steps.append(build_step(8, 1, 4, 6, 50, 60, 10, True, 1))
+    steps.append(build_step(9, 1, 6, 8, 60, 70, 10, False, 1))
 
     yield 7, 2, steps
 
@@ -141,11 +141,11 @@ def use_case_infeasible():
     """
     steps = []
 
-    steps.append(build_step(0, 0, -1, 0, 10, 30, False))
-    steps.append(build_step(0, 1, 0, 10, 20, 10, False))
+    steps.append(build_step(0, 0, 0, -1, 0, 10, 30, False))
+    steps.append(build_step(1, 0, 1, 0, 10, 20, 10, False))
 
-    steps.append(build_step(1, 0, -1, 10, 20, 10, False))
-    steps.append(build_step(1, 1, 0, 20, 30, 10, False))
+    steps.append(build_step(2, 1, 0, -1, 10, 20, 10, False))
+    steps.append(build_step(3, 1, 1, 0, 20, 30, 10, False))
 
     yield 2, 2, steps
 
@@ -162,11 +162,11 @@ def use_case_straight_line_2t():
         steps
     """
     steps = []
-    steps.append(build_step(0, 0, -1, 0, 10, 10, False))
-    steps.append(build_step(0, 1, 0, 10, 20, 20, False))
+    steps.append(build_step(0, 0, 0, -1, 0, 10, 10, False))
+    steps.append(build_step(1, 0, 1, 0, 10, 20, 20, False))
 
-    steps.append(build_step(1, 0, -1, 10, 20, 10, False))
-    steps.append(build_step(1, 1, 2, 20, 30, 10, False))
+    steps.append(build_step(2, 1, 0, -1, 10, 20, 10, False))
+    steps.append(build_step(3, 1, 1, 2, 20, 30, 10, False))
 
     yield 2, 2, steps
 
@@ -183,10 +183,10 @@ def use_case_empty_zone():
     """
     steps = []
 
-    steps.append(build_step(0, 0, -1, 0, 10, 10, False))
-    steps.append(build_step(0, 1, 0, 10, 20, 20, False))
+    steps.append(build_step(0, 0, 0, -1, 0, 10, 10, False))
+    steps.append(build_step(1, 0, 1, 0, 10, 20, 20, False))
 
-    steps.append(build_step(1, 0, -1, 10, 20, 10, False))
-    steps.append(build_step(1, 1, 2, 20, 30, 10, False))
+    steps.append(build_step(2, 1, 0, -1, 10, 20, 10, False))
+    steps.append(build_step(3, 1, 1, 2, 20, 30, 10, False))
 
     yield 2, 3, steps

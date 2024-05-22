@@ -36,6 +36,7 @@ The following data are retrieved from the results of an OSRD simulation.
 - $train_s \in \{1,..,N_{trains}\}, \forall s \in \{1,..,N_{steps}\}$ : The train associated with the step $s$
 - $zone_s \in \{1,..,N_{zones}\}, \forall s \in \{1,..,N_{steps}\}$ : The zone associated with the step $s$
 - $prev_s \in \{0..N_{steps}\}, \forall s \in \{1,..,N_{steps}\}$ : The step preceding $s$ (0 if None)
+- $next_s \in \{0..N_{steps}\}, \forall s \in \{1,..,N_{steps}\}$ : The step following $s$ (0 if None)
 
 **Arrival and departure times**
 - $min\_arrival_s \in \mathbb{N}, \forall s \in \{1,..,N_{steps}\}$ : The min arrival time of a step
@@ -45,10 +46,26 @@ The following data are retrieved from the results of an OSRD simulation.
 **Constraint depending on the type of zone (lane, block, switch...)**
 - $is\_fixed_s \in \{True, False\}, \forall s \in \{1,..,N_{steps}\}$ : If the duration of a step cannot be changed
 
+**Constants**
+- $T_c$ : The time setup to change between to different itineraries
+
 ## Decision variables
 
 - $arrival_s \in \mathbb{N}, \forall s \in \{1,..,N_{steps}\}$ : The arrival time of a step
 - $departure_s \in \mathbb{N}, \forall s \in \{1,..,N_{steps}\}$ : The departure time of a step
+
+## Intermediate variables
+
+- $prec_i^j \in \{0, 1\}, \forall i \in \{1,..,N_{steps}\}, \forall j \in \{1,..,N_{steps}\}$ : $1$ if step $j$ directly follows step $i$ on $zone_i$. It follows the basic structural constraint :
+$$
+zone_i \ne zone_j \text{ or } train_j = train_i \implies prec_i^j = 0
+$$
+- $first_s \in \{0, 1\}, \forall s \in \{1,..,N_{steps}\}$ : $1$ if the step is the first on $zone_s$.
+- $last_s \in \{0, 1\}, \forall s \in \{1,..,N_{steps}\}$ : $1$ if the step is the last on $zone_s$.
+- $diff\_it_i ^j \in \{0, 1\}, \forall i \in \{1,..,N_{steps}\}, \forall j \in \{1,..,N_{steps}\}$ : $1$ if and only if the steps $i$ and $j$ are followed by seps with different zone. This can be expressed like this :
+$$
+diff\_it_i^j = 1 \Leftrightarrow zone_{next_i} \ne zone_{next_j}
+$$
 
 ## Objective
 
@@ -94,7 +111,43 @@ $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s \neq 0, \\arrival_s = depar
 
 $$\forall s \in \{1,..,N_{steps}\} \; s.t. \; prev_s = 0, arrival_s = min\_arrival_s$$
 
-7. _OPTIONAL_ A train cannot overtake another train (we use the reference ($min\_arrival$) to determine the order of trains)
+### Enforce order (optional)
+
+7. A train cannot overtake another train (we use the reference ($min\_arrival$) to determine the order of trains)
 
 $$\forall s1, s2 \in \{1,...,N_{steps}\}\;s.t.\;  min\_arrival_{s1} < min\_arrival_{s2},\\
 arrival_{s1} < arrival_{s2}$$
+
+### Precedence constraints
+
+8. There can only be one step being the first in a zone
+$$
+\forall z \in N_{zones}\; \sum_{s \in \{zone_s = z\}}first_s=1
+$$
+
+9. There can only be one step being the last in a zone
+$$
+\forall z \in N_{zones}\; \sum_{s \in \{zone_s = z\}}last_s=1
+$$
+
+10. If a step $i$ follows a step $j$ then the revese cannot be true
+$$
+prec_i^j + prec_j^i \le 1
+$$
+
+11. For every step $i$ the following step $j$ must starts after the end of step $j$. An itinerary setup is added if the
+itineraries are different on the next steps of each $i$ and $j$.
+
+$$
+\forall i \in {1,..., N_{steps}}\;\forall j \in {1,..., N_{steps}}\;\\prec_i^j \implies departure_{i} + T_c \times diff\_it_i ^j \le arrival_{j}
+$$
+
+12. For every step there must be exactly one following step except if it's the last step on its zone
+$$
+\forall i \in {1,..., N_{steps}}\;\sum_{j\in \{j, zone_j = zone_i\}} prec_i^j + last_i = 1
+$$
+
+13. For every step there must be exactly one previous step except if it's the first step on its zone
+$$
+\forall i \in {1,..., N_{steps}}\;\sum_{j\in \{j, zone_j = zone_i\}} prec_j^i + first_i = 1
+$$
