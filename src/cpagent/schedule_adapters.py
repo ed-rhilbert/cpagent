@@ -103,18 +103,19 @@ def steps_from_schedule(
         for zone in ref_schedule.path(train):
             overlap = 0
             if prev_zone is not None:
-                overlap = max(0, int(delayed_ends.loc[prev_zone][train]
-                              - delayed_starts.loc[zone][train]))
+                overlap = max(0, int(delayed_ends.loc[prev_zone, train]
+                              - delayed_starts.loc[zone, train]))
+            print(fixed_durations)
             is_fixed = (
                 True
                 if (fixed_durations is not None
-                    and fixed_durations.loc[zone, train_idx])
+                    and fixed_durations.loc[zone, fixed_durations.columns[train_idx]])
                 else False
             )
             ponderation = (
                 1
                 if weights is None
-                else weights.loc[zone][train]
+                else weights.loc[zone, train]
             )
 
             if prev_step >= 0:
@@ -125,9 +126,9 @@ def steps_from_schedule(
                 train=train,
                 zone=zones.index(zone),
                 prev_idx=prev_step,
-                min_t_in=int(delayed_starts.loc[zone][train]),
-                min_t_out=int(delayed_ends.loc[zone][train]),
-                min_duration=int(min_times.loc[zone][train]),
+                min_t_in=int(delayed_starts.loc[zone, train]),
+                min_t_out=int(delayed_ends.loc[zone, train]),
+                min_duration=int(min_times.loc[zone, train]),
                 is_fixed=is_fixed,
                 ponderation=ponderation,
                 overlap=overlap
