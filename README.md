@@ -55,7 +55,8 @@ JAVA="""C:\Program Files\Common Files\Oracle\Java\javapath\java"""
 # For contributors
 
 ```bash
-git clone git@github.com/ed-rhilbert/cpagent.git
+git clone git@github.com:ed-rhilbert/cpagent.git
+cd cpagent
 python3 -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
