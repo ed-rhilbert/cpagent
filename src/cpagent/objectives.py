@@ -15,5 +15,8 @@ def _create_objective(
     model.Minimize(sum([
         (self.t_in[i] - step['min_t_in'])
         * step['ponderation']
+        +
+        ((self.t_out[i] - step['min_t_out'])
+            * step['ponderation'] if self.penalize_t_out else 0.)
         for i, step in enumerate(self.steps)
     ]))

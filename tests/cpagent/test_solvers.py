@@ -48,6 +48,28 @@ def test_solver_simple(solver, use_case_straight_line_2t):
 @pytest.mark.parametrize("solver", [
     CpAgent("ortools")
 ])
+def test_solver_simple_penalize_t_out(solver, use_case_straight_line_2t):
+    """Testing solver on a simple use case with
+        t_out penalization
+    """
+    solver.penalize_t_out = True
+    cp_solver, _ = solver._solve_from_steps(
+        use_case_straight_line_2t[0],
+        use_case_straight_line_2t[1],
+        use_case_straight_line_2t[2]
+    )
+    cp_solver.Values(solver.t_in).to_list()
+    cost_oracle = 40
+    t_in_oracle = [0, 10, 10, 30]
+    t_out_oracle = [10, 30, 30, 40]
+    assert int(cp_solver.ObjectiveValue()) == cost_oracle
+    assert cp_solver.Values(solver.t_in).to_list() == t_in_oracle
+    assert cp_solver.Values(solver.t_out).to_list() == t_out_oracle
+
+
+@pytest.mark.parametrize("solver", [
+    CpAgent("ortools")
+])
 def test_solver_infeasible(solver, use_case_infeasible):
     """Test solver with infeasible problem
     """
