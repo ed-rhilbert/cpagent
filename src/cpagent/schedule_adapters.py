@@ -105,7 +105,6 @@ def steps_from_schedule(
             if prev_zone is not None:
                 overlap = max(0, int(delayed_ends.loc[prev_zone, train]
                               - delayed_starts.loc[zone, train]))
-            print(fixed_durations)
             is_fixed = (
                 True
                 if (fixed_durations is not None
