@@ -1,16 +1,17 @@
 from copy import deepcopy
 
 import pandas as pd
+from pandas.testing import assert_frame_equal
+
+from pyosrd.osrd import OSRD
+from pyosrd.schedules import schedule_from_osrd
+
 from cpagent.schedule_adapters import (
     build_step,
     steps_from_schedule,
     schedule_from_solution,
     OptimisationStatus,
 )
-
-from pyosrd.osrd import OSRD
-from pyosrd.schedules import schedule_from_osrd
-
 
 def steps_from_osrd(
     osrd: OSRD,
@@ -73,9 +74,5 @@ def test_schedule_from_solution(schedule_straight_line_2t):
     oracle_regulated.set(1, 0, [10, 30])
     oracle_regulated.set(1, 1, [30, 40])
 
-    assert (regulated_schedule.durations
-            == oracle_regulated.durations).all().all()
-    assert (regulated_schedule.starts
-            == oracle_regulated.starts).all().all()
-    assert (regulated_schedule.ends
-            == oracle_regulated.ends).all().all()
+    assert_frame_equal(regulated_schedule.df, oracle_regulated.df)
+
